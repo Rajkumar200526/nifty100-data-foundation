@@ -21,3 +21,42 @@ CREATE TABLE financial_ratios (
     FOREIGN KEY (company_id)
         REFERENCES companies(company_id)
 );
+CREATE TABLE profitandloss (
+    pnl_id INTEGER PRIMARY KEY,
+    company_id INTEGER,
+    year INTEGER,
+    revenue REAL,
+    net_profit REAL,
+    FOREIGN KEY(company_id)
+        REFERENCES companies(company_id)
+);
+
+CREATE TABLE balancesheet (
+    bs_id INTEGER PRIMARY KEY,
+    company_id INTEGER,
+    year INTEGER,
+    total_assets REAL,
+    total_liabilities REAL,
+    FOREIGN KEY(company_id)
+        REFERENCES companies(company_id)
+);
+
+CREATE TABLE cashflow (
+    cf_id INTEGER PRIMARY KEY,
+    company_id INTEGER,
+    year INTEGER,
+    operating_cashflow REAL,
+    investing_cashflow REAL,
+    financing_cashflow REAL,
+    FOREIGN KEY(company_id)
+        REFERENCES companies(company_id)
+);
+
+CREATE TABLE stock_prices (
+    price_id INTEGER PRIMARY KEY,
+    company_id INTEGER,
+    trade_date TEXT,
+    close_price REAL,
+    FOREIGN KEY(company_id)
+        REFERENCES companies(company_id)
+);
