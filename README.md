@@ -18,3 +18,24 @@ Activate venv:
 
 ```bash
 venv\Scripts\activate
+# Nifty100 Data Foundation
+
+## Project Structure
+
+data/
+db/
+docs/
+src/
+tests/
+
+## Components
+
+- Loader
+- Normalizer
+- Validator
+- Database Loader
+- SQLite Database
+
+## Testing
+
+Total Tests: 46+
