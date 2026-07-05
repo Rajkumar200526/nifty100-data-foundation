@@ -1,0 +1,4 @@
+company_id,company_name,year,sales,net_profit,operating_profit,equity_capital,reserves,borrowings,total_assets,other_income,interest,operating_activity,investing_activity
+1,TCS,2024,1000,200,250,300,700,100,2000,50,20,400,-100
+2,Infosys,2024,900,180,220,250,650,120,1800,40,25,350,-80
+3,Reliance,2024,1500,250,320,500,1000,300,3500,60,50,700,-250
