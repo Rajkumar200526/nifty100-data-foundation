@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>N100 Financial Intelligence Dashboard</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="{{ url_for('static', filename='js/chart.umd.js') }}"></script>
+
+    <style>
+
+        body{
+            background:#f4f7fb;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        h1{
+            color:#0d6efd;
+            font-weight:bold;
+        }
+
+        .card{
+            border:none;
+            border-radius:15px;
+            box-shadow:0px 4px 10px rgba(0,0,0,0.1);
+        }
+
+        table{
+            background:white;
+        }
+
+        canvas{
+            max-height:450px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-primary shadow">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">
+            📊 N100 Financial Intelligence Dashboard
+        </span>
+    </div>
+</nav>
+
+<div class="container mt-5">
+
+    <h1 class="text-center mb-4">
+        N100 Financial Intelligence Dashboard
+    </h1>
+
+    <!-- KPI Cards -->
+
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+
+            <div class="card text-white bg-primary p-3 text-center">
+
+                <h5>Total Companies</h5>
+
+                <h2>{{ total_companies }}</h2>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card text-white bg-success p-3 text-center">
+
+                <h5>Top Score</h5>
+
+                <h2>{{ top_score }}</h2>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card text-white bg-warning p-3 text-center">
+
+                <h5>Average Score</h5>
+
+                <h2>{{ average_score }}</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="card p-4 mb-4">
+
+    <h4 class="mb-3">🏆 Top 5 Companies</h4>
+
+    <table class="table table-striped">
+
+        <thead class="table-success">
+            <tr>
+                <th>Rank</th>
+                <th>Company</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for row in top5 %}
+
+        <tr>
+
+            <td>{{ row.rank }}</td>
+
+            <td>
+    <a href="/company/{{ row.company_id }}">
+        {{ row.company_name }}
+    </a>
+</td>
+
+
+
+            <td>{{ "%.2f"|format(row.overall_score) }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+    <!-- Chart -->
+
+    <div class="card p-4 mb-4">
+
+        <h4 class="text-center mb-3">
+            Top Companies by Overall Score
+        </h4>
+
+        <div style="height:500px;">
+    <canvas id="scoreChart"
+            width="800"
+            height="400">
+    </canvas>
+</div>
+
+    </div>
+<div class="card p-4 mb-4">
+
+    <h4 class="text-center mb-3">
+        Overall Score Distribution
+    </h4>
+
+    <div style="height:500px;">
+        <canvas id="pieChart"></canvas>
+    </div>
+
+</div>
+<!-- Line Chart -->
+
+<div class="card p-4 mb-4">
+
+    <h4 class="text-center mb-3">
+        Overall Score Trend
+    </h4>
+
+    <div style="height:500px;">
+        <canvas id="lineChart"></canvas>
+    </div>
+
+</div>
+
+    <!-- Table -->
+
+    <div class="card p-3">
+
+        <h4 class="mb-3">
+            Company Ranking
+        </h4>
+        <input
+    type="text"
+    id="searchInput"
+    class="form-control mb-3"
+    placeholder="🔍 Search Company..."
+    onkeyup="searchCompany()">
+
+        <table class="table table-bordered table-hover" id="companyTable">
+
+            <thead class="table-primary">
+
+                <tr>
+
+                    <th>Rank</th>
+                    <th>Company</th>
+                    <th>Overall Score</th>
+                    <th>CFO Quality</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for row in companies %}
+
+                <tr>
+
+                    <td>{{ row.rank }}</td>
+
+                    <td>{{ row.company_name }}</td>
+
+                    <td>
+    {% if row.overall_score >= 80 %}
+        <span class="badge bg-success">{{ "%.2f"|format(row.overall_score) }}</span>
+    {% elif row.overall_score >= 60 %}
+        <span class="badge bg-warning text-dark">{{ "%.2f"|format(row.overall_score) }}</span>
+    {% else %}
+        <span class="badge bg-danger">{{ "%.2f"|format(row.overall_score) }}</span>
+    {% endif %}
+</td>
+
+                    <td>{{ row.cfo_quality_label }}</td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+const companyNames = {{ company_names | tojson }};
+const companyScores = {{ company_scores | tojson }};
+
+// ================= BAR CHART =================
+const ctx = document.getElementById("scoreChart");
+
+if (ctx) {
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: companyNames,
+            datasets: [{
+                label: "Overall Score",
+                data: companyScores,
+                backgroundColor: [
+                    "#0d6efd",
+                    "#198754",
+                    "#ffc107",
+                    "#dc3545",
+                    "#6f42c1",
+                    "#20c997",
+                    "#fd7e14",
+                    "#6610f2",
+                    "#0dcaf0",
+                    "#adb5bd"
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// ================= PIE CHART =================
+const pieCtx = document.getElementById("pieChart");
+
+if (pieCtx) {
+    new Chart(pieCtx, {
+        type: "pie",
+        data: {
+            labels: companyNames,
+            datasets: [{
+                data: companyScores,
+                backgroundColor: [
+                    "#0d6efd",
+                    "#198754",
+                    "#ffc107",
+                    "#dc3545",
+                    "#6f42c1",
+                    "#20c997",
+                    "#fd7e14",
+                    "#6610f2",
+                    "#0dcaf0",
+                    "#adb5bd"
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+}
+// ================= LINE CHART =================
+
+const lineCtx = document.getElementById("lineChart");
+
+if (lineCtx) {
+    new Chart(lineCtx, {
+        type: "line",
+        data: {
+            labels: companyNames,
+            datasets: [{
+                label: "Overall Score",
+                data: companyScores,
+                borderColor: "#0d6efd",
+                backgroundColor: "rgba(13,110,253,0.2)",
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+function searchCompany() {
+
+    let input = document.getElementById("searchInput");
+
+    let filter = input.value.toUpperCase();
+
+    let table = document.getElementById("companyTable");
+
+    let tr = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < tr.length; i++) {
+
+        let td = tr[i].getElementsByTagName("td")[1];
+
+        if (td) {
+
+            let txtValue = td.textContent || td.innerText;
+
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+
+                tr[i].style.display = "";
+
+            } else {
+
+                tr[i].style.display = "none";
+
+            }
+        }
+    }
+}
+</script>
+<footer class="text-center mt-5 mb-3 text-muted">
+    <hr>
+    <p>© 2026 N100 Financial Intelligence Platform | Developed by Rajkumar</p>
+</footer>
+</body>
+
+</html>
+{% endblock %}

@@ -1,81 +1,135 @@
-"""
-Sprint 2 – Day 11
-Cash Flow KPIs
-"""
+import sqlite3
+import pandas as pd
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parents[2]
 
+DB_PATH = BASE_DIR / "db" / "nifty100.db"
 
-def free_cash_flow(operating_activity, investing_activity):
-    """
-    Free Cash Flow (FCF)
+OUTPUT_DIR = BASE_DIR / "output"
+conn = sqlite3.connect(DB_PATH)
+cashflow_df = pd.read_sql("""
+SELECT
+    company_id,
+    year,
+    operating_cashflow,
+    investing_cashflow,
+    financing_cashflow
+FROM cashflow;
+""", conn)
 
-    Formula:
-    CFO + CFI
-    """
+profit_df = pd.read_sql("""
+SELECT
+    company_id,
+    year,
+    net_profit
+FROM profitandloss;
+""", conn)
 
-    return operating_activity + investing_activity
-def cfo_quality_score(cfo, pat):
-    """
-    CFO Quality Score
-    """
+cashflow_df = cashflow_df.merge(
+    profit_df,
+    on=["company_id", "year"],
+    how="left"
+)
 
-    if pat == 0:
-        return None
+# ===========================
+# ADD THE NEW CODE HERE
+# ===========================
 
-    ratio = cfo / pat
+# Calculate CFO/PAT Ratio
+cashflow_df["cfo_pat_ratio"] = (
+    cashflow_df["operating_cashflow"] /
+    cashflow_df["net_profit"]
+)
 
+# Average CFO/PAT Ratio over 5 years
+cfo_quality = (
+    cashflow_df
+    .groupby("company_id")["cfo_pat_ratio"]
+    .mean()
+    .reset_index()
+)
+
+# Classify CFO Quality
+def classify_cfo_quality(ratio):
     if ratio > 1.0:
         return "High Quality"
-
     elif ratio >= 0.5:
         return "Moderate"
-
-    return "Accrual Risk"
-def capex_intensity(investing_activity, sales):
-    """
-    CapEx Intensity
-    """
-
-    if sales == 0:
-        return None
-
-    intensity = abs(investing_activity) / sales * 100
-
-    if intensity < 3:
-        label = "Asset Light"
-    elif intensity <= 8:
-        label = "Moderate"
     else:
-        label = "Capital Intensive"
+        return "Accrual Risk"
 
-    return round(intensity, 2), label
-def fcf_conversion_rate(fcf, operating_profit):
-    """
-    FCF Conversion Rate
-    """
+cfo_quality["cfo_quality_label"] = (
+    cfo_quality["cfo_pat_ratio"]
+    .apply(classify_cfo_quality)
+)
 
-    if operating_profit == 0:
-        return None
+print(cfo_quality)
+# Calculate CapEx Intensity
+cashflow_df["capex_intensity"] = (
+    cashflow_df["investing_cashflow"].abs() /
+    cashflow_df["operating_cashflow"].abs()
+)
 
-    return round((fcf / operating_profit) * 100, 2)
-def capital_allocation_pattern(cfo, cfi, cff):
-    """
-    Capital Allocation Pattern Classifier
-    """
+capex = (
+    cashflow_df
+    .groupby("company_id")["capex_intensity"]
+    .mean()
+    .reset_index()
+)
 
-    signs = (
-        "+" if cfo >= 0 else "-",
-        "+" if cfi >= 0 else "-",
-        "+" if cff >= 0 else "-"
-    )
+print("\nCapEx Intensity")
+print(capex)
+# Distress Signal
+cashflow_df["distress_signal"] = (
+    (cashflow_df["operating_cashflow"] < 0) &
+    (cashflow_df["financing_cashflow"] > 0)
+)
 
-    patterns = {
-        ("+","-","-"): "Reinvestor",
-        ("+","+","-"): "Liquidating Assets",
-        ("-","+","+"): "Distress Signal",
-        ("-","-","+"): "Growth Funded by Debt",
-        ("+","+","+"): "Cash Accumulator",
-        ("-","-","-"): "Pre-Revenue",
-        ("+","-","+"): "Mixed"
-    }
+distress = (
+    cashflow_df
+    .groupby("company_id")["distress_signal"]
+    .sum()
+    .reset_index()
+)
 
-    return patterns.get(signs, "Other")
+print("\nDistress Signal")
+print(distress)
+# Deleveraging Flag
+cashflow_df["deleveraging_flag"] = (
+    cashflow_df["financing_cashflow"] < 0
+)
+
+deleveraging = (
+    cashflow_df
+    .groupby("company_id")["deleveraging_flag"]
+    .sum()
+    .reset_index()
+)
+
+print("\nDeleveraging Flag")
+print(deleveraging)
+cashflow_intelligence = (
+    cfo_quality
+    .merge(capex, on="company_id")
+    .merge(distress, on="company_id")
+    .merge(deleveraging, on="company_id")
+)
+
+print("\nCash Flow Intelligence")
+print(cashflow_intelligence)
+from pathlib import Path
+
+output_dir = Path("output")
+output_dir.mkdir(exist_ok=True)
+
+cashflow_intelligence.to_excel(
+    output_dir / "cashflow_intelligence.xlsx",
+    index=False
+)
+
+print("\n✅ cashflow_intelligence.xlsx saved successfully!")
+# ===========================
+# END OF NEW CODE
+# ===========================
+
+conn.close()

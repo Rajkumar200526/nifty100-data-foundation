@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">📄 Reports</h2>
+
+<div class="list-group">
+
+    <a href="/download/company-ranking"
+       class="list-group-item list-group-item-action">
+       📊 Company Ranking Report
+    </a>
+
+    <a href="/download/financial-health"
+       class="list-group-item list-group-item-action">
+       📈 Financial Health Report
+    </a>
+
+    <a href="/download/cashflow"
+       class="list-group-item list-group-item-action">
+       💰 Cash Flow Intelligence Report
+    </a>
+
+    <a href="/download/earnings"
+       class="list-group-item list-group-item-action">
+       📑 Earnings Quality Report
+    </a>
+
+    <a href="/download/recommendations"
+       class="list-group-item list-group-item-action">
+       💹 Investment Recommendations
+    </a>
+
+    <a href="/download/distress"
+       class="list-group-item list-group-item-action">
+       ⚠ Distress Alerts
+    </a>
+
+</div>
+
+{% endblock %}

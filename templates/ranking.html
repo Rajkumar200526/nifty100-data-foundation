@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">🏆 Company Ranking</h2>
+
+<table class="table table-striped table-hover">
+
+    <thead class="table-primary">
+        <tr>
+            <th>Rank</th>
+            <th>Company</th>
+            <th>Overall Score</th>
+            <th>CFO Quality</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for row in companies %}
+
+    <tr>
+
+        <td>{{ row.rank }}</td>
+
+        <td>{{ row.company_name }}</td>
+
+        <td>{{ "%.2f"|format(row.overall_score) }}</td>
+
+        <td>{{ row.cfo_quality_label }}</td>
+
+        <td>
+            <a href="/company/{{ row.company_id }}" class="btn btn-primary btn-sm">
+                View
+            </a>
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}
