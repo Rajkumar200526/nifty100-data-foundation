@@ -1,0 +1,6 @@
+company_id,company_name,broad_sector,Investment Score,Rank,Recommendation,Allocation (%)
+6,Larsen & Toubro,Industrials,84.71728088412357,1,Strong Buy,20.0
+2,Infosys,Information Technology,68.29021285653207,2,Buy,20.0
+5,ICICI Bank,Financials,60.10864096836797,3,Hold,20.0
+1,TCS,Information Technology,40.98243458842919,4,Reduce,20.0
+10,Wipro,Information Technology,28.99199389838871,5,Sell,20.0

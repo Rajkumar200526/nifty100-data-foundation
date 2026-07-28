@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Companies</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+
+            <h3>Compare Two Companies</h3>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-5">
+
+                    <label>Company 1</label>
+
+                    <select id="company1" class="form-select">
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-5">
+
+                    <label>Company 2</label>
+
+                    <select id="company2" class="form-select">
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-2 d-grid">
+
+                    <label>&nbsp;</label>
+
+                    <button
+                        class="btn btn-success"
+                        onclick="compareCompanies()">
+
+                        Compare
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <hr>
+            <div class="card mb-4 border-success">
+
+    <div class="card-header bg-success text-white">
+        <h4>🏆 Comparison Summary</h4>
+    </div>
+
+    <div class="card-body">
+
+        <p id="winnerSales"></p>
+
+        <p id="winnerProfit"></p>
+
+        <p id="winnerROE"></p>
+
+        <p id="winnerDebt"></p>
+
+        <hr>
+
+        <h3 id="overallWinner" class="text-primary fw-bold"></h3>
+
+    </div>
+
+</div>
+
+            <table class="table table-bordered">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Metric</th>
+
+                        <th id="companyName1">Company 1</th>
+
+                        <th id="companyName2">Company 2</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <th>Sales</th>
+
+                        <td id="sales1"></td>
+
+                        <td id="sales2"></td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>Net Profit</th>
+
+                        <td id="profit1"></td>
+
+                        <td id="profit2"></td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>ROE</th>
+
+                        <td id="roe1"></td>
+
+                        <td id="roe2"></td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>ROA</th>
+
+                        <td id="roa1"></td>
+
+                        <td id="roa2"></td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>Debt / Equity</th>
+
+                        <td id="debt1"></td>
+
+                        <td id="debt2"></td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+            <canvas id="compareChart"></canvas>
+
+            <br>
+
+            <a href="dashboard.html"
+               class="btn btn-secondary">
+
+                Back
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/compare.js"></script>
+
+</body>
+
+</html>

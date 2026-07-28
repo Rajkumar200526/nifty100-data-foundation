@@ -1,0 +1,11 @@
+company_id,company_name,cluster_id,cluster_name,distance_from_centroid
+1,TCS,4,Turnaround,0.7388880003319971
+2,Infosys,1,Defensive Dividend,1.108205149972445
+3,Reliance Industries,0,High Quality Compounders,0.0
+4,HDFC Bank,3,Value Cyclicals,0.6898850003079521
+5,ICICI Bank,1,Defensive Dividend,1.1082051499724446
+6,Larsen & Toubro,2,Emerging Growth,0.0
+7,ITC,3,Value Cyclicals,0.8885988443035128
+8,Bharti Airtel,3,Value Cyclicals,1.0692420170597374
+9,Axis Bank,4,Turnaround,0.7388880003319974
+10,Wipro,3,Value Cyclicals,0.8890283902006038

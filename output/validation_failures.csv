@@ -1,0 +1,2 @@
+rule_id,severity,message
+DQ-01,CRITICAL,Duplicate company_id

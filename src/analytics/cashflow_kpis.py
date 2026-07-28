@@ -1,6 +1,51 @@
 import sqlite3
 import pandas as pd
 from pathlib import Path
+# ==========================================
+# KPI Functions used by ratio_engine.py
+# ==========================================
+
+def free_cash_flow(operating_activity, investing_activity):
+    """
+    Free Cash Flow = Operating Cash Flow + Investing Cash Flow
+    (Investing cash flow is usually negative.)
+    """
+    return operating_activity + investing_activity
+
+
+def capex_intensity(investing_activity, sales):
+    """
+    Returns:
+        (percentage, label)
+    """
+
+    if sales == 0:
+        return (None, "N/A")
+
+    pct = abs(investing_activity) / sales * 100
+
+    if pct > 15:
+        label = "High"
+    elif pct > 5:
+        label = "Moderate"
+    else:
+        label = "Low"
+
+    return (round(pct, 2), label)
+
+
+def fcf_conversion_rate(free_cash_flow, operating_profit):
+    """
+    Free Cash Flow Conversion (%)
+    """
+
+    if operating_profit == 0:
+        return None
+
+    return round(
+        free_cash_flow / operating_profit * 100,
+        2
+    )
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 DB_PATH = BASE_DIR / "db" / "nifty100.db"

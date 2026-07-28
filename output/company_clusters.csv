@@ -1,0 +1,11 @@
+company_id,company_name,year,roe,debt_to_equity,operating_profit,sales,free_cash_flow,operating_profit_margin,cluster,cluster_name
+6,Larsen & Toubro,2024,78.66,0.28,11518.25,47316,3658.74,24.34,2,High Performance Companies
+5,ICICI Bank,2024,34.5,0.0,6979.72,31018,11318.43,22.5,0,Stable Companies
+4,HDFC Bank,2024,18.96,0.62,5258.37,20189,-3387.09,26.05,1,Growth Companies
+3,Reliance Industries,2024,45.2,0.5,3644.61,18429,447.47999999999956,19.78,1,Growth Companies
+2,Infosys,2024,36.46,0.0,8481.08,44006,3742.5300000000007,19.27,0,Stable Companies
+1,TCS,2024,19.7,0.19,6796.85,36208,496.16999999999916,18.77,0,Stable Companies
+8,Bharti Airtel,2024,12.53,0.57,5564.02,35515,3004.2799999999997,15.67,1,Growth Companies
+7,ITC,2024,18.55,0.62,2991.92,13190,-475.78999999999996,22.68,1,Growth Companies
+9,Axis Bank,2024,13.71,0.06,4477.91,20903,1403.75,21.42,0,Stable Companies
+10,Wipro,2024,27.0,0.47,6245.24,43716,-2502.4500000000003,14.29,1,Growth Companies

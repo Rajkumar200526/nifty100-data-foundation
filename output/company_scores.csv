@@ -1,0 +1,11 @@
+company_id,company_name,broad_sector,Investment Score,Rank,Recommendation
+6,Larsen & Toubro,Industrials,84.71728088412357,1,Strong Buy
+2,Infosys,Information Technology,68.29021285653207,2,Buy
+5,ICICI Bank,Financials,60.10864096836797,3,Hold
+1,TCS,Information Technology,40.98243458842919,4,Reduce
+10,Wipro,Information Technology,28.99199389838871,5,Sell
+9,Axis Bank,Financials,28.03844624890187,6,Sell
+3,Reliance Industries,Energy,27.056145923788726,7,Sell
+8,Bharti Airtel,Telecom,21.41715571315941,8,Sell
+4,HDFC Bank,Financials,8.803221053749255,9,Sell
+7,ITC,Consumer Goods,4.5894704298513815,10,Sell
