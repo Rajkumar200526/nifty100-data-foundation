@@ -8,7 +8,11 @@ __pycache__/
 # ----------------------------
 # Virtual Environment
 # ----------------------------
+.venv/
 venv/
+env/
+
+# Environment Variables
 .env
 
 # ----------------------------
@@ -28,6 +32,7 @@ htmlcov/
 # Operating System
 # ----------------------------
 Thumbs.db
+Desktop.ini
 .DS_Store
 
 # ----------------------------
@@ -36,7 +41,7 @@ Thumbs.db
 *.log
 
 # ----------------------------
-# SQLite temporary files
+# SQLite
 # ----------------------------
 *.db-journal
 
@@ -44,3 +49,15 @@ Thumbs.db
 # Jupyter
 # ----------------------------
 .ipynb_checkpoints/
+
+# ----------------------------
+# Build / Distribution
+# ----------------------------
+build/
+dist/
+*.egg-info/
+
+# ----------------------------
+# Temporary Files
+# ----------------------------
+*.tmp
