@@ -1,4 +1,17 @@
 const API_URL = "http://127.0.0.1:8000";
+function showLoader() {
+    console.log("Loading...");
+}
+
+function hideLoader() {
+    console.log("Done.");
+}
+
+function showAlert(message, type = "info") {
+    alert(message);
+}
+checkAuth();
+const token = getToken();
 
 let chart = null;
 let sectorData = [];
@@ -6,9 +19,13 @@ Chart.register(ChartDataLabels);
 
 async function loadSectorAnalytics() {
 
+    showLoader();
+
     try {
 
-        const response = await fetch(`${API_URL}/sector-analytics`);
+        const response = await fetch(`${API_URL}/sector-analysis`, {
+    headers: getAuthHeaders()
+});
 
         if (!response.ok) {
             throw new Error("Failed to fetch sector analytics");
@@ -20,25 +37,34 @@ async function loadSectorAnalytics() {
     // Populate sector filter
 const sectorFilter = document.getElementById("sectorFilter");
 
-// Clear old options except "All Sectors"
-sectorFilter.innerHTML = '<option value="All">All Sectors</option>';
+if (sectorFilter) {
 
-data.forEach(item => {
-    sectorFilter.innerHTML += `
-        <option value="${item.sector}">
-            ${item.sector}
-        </option>
-    `;
-});
+    sectorFilter.innerHTML = '<option value="All">All Sectors</option>';
+
+    data.forEach(item => {
+        sectorFilter.innerHTML += `
+            <option value="${item.sector}">
+                ${item.sector}
+            </option>
+        `;
+    });
+
+}
+
+
 
         updateDashboard(data);
 
-    } catch (err) {
+  } catch (err) {
 
-        console.error(err);
-        alert("Unable to load sector analytics.");
+    console.error(err);
+    showAlert("Unable to load sector analytics.", "danger");
 
-    }
+} finally {
+
+    hideLoader();
+
+}
 
 }
 
@@ -160,8 +186,17 @@ function drawChart(labels, values) {
 
 loadSectorAnalytics();
 
-document.getElementById("sectorFilter").addEventListener("change", filterSector);
-document.getElementById("searchSector").addEventListener("keyup", searchSector);
+const sectorFilterElement = document.getElementById("sectorFilter");
+
+if (sectorFilterElement) {
+    sectorFilterElement.addEventListener("change", filterSector);
+}
+
+const searchSectorElement = document.getElementById("searchSector");
+
+if (searchSectorElement) {
+    searchSectorElement.addEventListener("keyup", searchSector);
+}
 function filterSector() {
 
     const selectedSector = document.getElementById("sectorFilter").value;

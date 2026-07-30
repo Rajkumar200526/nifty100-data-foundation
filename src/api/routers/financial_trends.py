@@ -11,18 +11,21 @@ def financial_trends(company_id: int):
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT
-            year,
-            sales,
-            net_profit,
-            operating_profit,
-            roe,
-            roce,
-            free_cash_flow
-        FROM financial_ratios
-        WHERE company_id = ?
-        ORDER BY year
-    """, (company_id,))
+    SELECT
+        c.company_name,
+        fr.year,
+        fr.sales,
+        fr.net_profit,
+        fr.operating_profit,
+        fr.roe,
+        fr.roce,
+        fr.free_cash_flow
+    FROM financial_ratios fr
+    INNER JOIN companies c
+        ON fr.company_id = c.company_id
+    WHERE fr.company_id = ?
+    ORDER BY fr.year
+""", (company_id,))
 
     data = [dict(row) for row in cursor.fetchall()]
 

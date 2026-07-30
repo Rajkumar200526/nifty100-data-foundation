@@ -1,109 +1,171 @@
-const API = "http://127.0.0.1:8000";
 
-const token = localStorage.getItem("token");
 
-if (!token) {
-    window.location.href = "login.html";
-}
+checkAuth();
 
 const params = new URLSearchParams(window.location.search);
 const companyId = params.get("id");
+if (!companyId) {
+
+    showAlert("Company ID not found.", "warning");
+
+    setTimeout(() => {
+        window.location.href = "dashboard.html";
+    }, 1500);
+
+    throw new Error("Missing company id");
+}
+
+let ratioChart = null;
 
 async function loadRatios() {
 
+    showLoader();
+
     try {
 
-        const response = await fetch(`${API}/company/${companyId}/ratios`, {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
+  const response = await fetch(
+    `${API}/company/${companyId}/ratios`,
+    {
+        headers: getAuthHeaders()
+    }
+);
 
         if (!response.ok) {
-            alert("Unable to load financial ratios.");
+            showAlert("Unable to load ratios.", "danger");
             return;
         }
 
         const data = await response.json();
+        console.log(data);
 
-        // Latest year data
+        if (!Array.isArray(data) || data.length === 0) {
+            showAlert("No financial ratio data found.", "warning");
+            return;
+        }
+
         const latest = data[data.length - 1];
+        document.getElementById("roe").innerText =
+    latest.roe != null
+        ? latest.roe.toFixed(2) + "%"
+        : "N/A";
 
-        // Company Details
-        document.getElementById("companyName").innerHTML = latest.company_name;
+      document.getElementById("companyName").innerText =
+    `Financial Trends - ${latest.company_name}`;
 
-        document.getElementById("roe").innerHTML = latest.roe + " %";
-        document.getElementById("roa").innerHTML = latest.roa + " %";
-        document.getElementById("debt").innerHTML = latest.debt_to_equity;
+        document.getElementById("roa").innerText =
+    latest.roa != null
+        ? latest.roa.toFixed(2) + "%"
+        : "N/A";
 
-        // Not available in database
-        document.getElementById("current").innerHTML = "N/A";
-        document.getElementById("pe").innerHTML = "N/A";
-        document.getElementById("eps").innerHTML = "N/A";
-        document.getElementById("marketcap").innerHTML = "N/A";
+document.getElementById("debt").innerText =
+    latest.debt_to_equity != null
+        ? latest.debt_to_equity.toFixed(2)
+        : "N/A";
 
-        // Arrays for charts
+document.getElementById("currentRatio").innerText =
+    latest.current_ratio != null
+        ? latest.current_ratio.toFixed(2)
+        : "N/A";
+
+        document.getElementById("roce").innerText =
+            latest.roce != null
+                ? latest.roce.toFixed(2) + "%"
+                : "N/A";
+
+        document.getElementById("fcf").innerText =
+            latest.free_cash_flow != null
+                ? Number(latest.free_cash_flow).toLocaleString()
+                : "N/A";
+
+        document.getElementById("backCompany").href =
+            `company.html?id=${companyId}`;
+
         const years = data.map(item => item.year);
-        const sales = data.map(item => item.sales);
-        const profits = data.map(item => item.net_profit);
-        const roe = data.map(item => item.roe);
-        const freeCashFlow = data.map(item => item.free_cash_flow);
 
-        // Sales Chart
-        new Chart(document.getElementById("salesChart"), {
-            type: "line",
-            data: {
-                labels: years,
-                datasets: [{
-                    label: "Sales",
-                    data: sales,
-                    borderWidth: 3,
-                    fill: false
-                }]
+        if (ratioChart) {
+            ratioChart.destroy();
+        }
+
+        ratioChart = new Chart(
+            document.getElementById("ratioChart"),
+            {
+                type: "line",
+
+                data: {
+
+                    labels: years,
+
+   datasets: [
+
+    {
+        label: "ROE %",
+        data: data.map(item => item.roe ?? 0),
+        borderWidth: 2,
+        fill: false
+    },
+
+    {
+        label: "ROCE %",
+        data: data.map(item => item.roce ?? 0),
+        borderWidth: 2,
+        fill: false
+    },
+
+    {
+        label: "Free Cash Flow",
+        data: data.map(item => item.free_cash_flow ?? 0),
+        borderWidth: 2,
+        fill: false
+    }
+
+]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+                            position: "top"
+                        }
+
+                    },
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: true
+
+                        }
+
+                    }
+
+                }
+
             }
-        });
 
-        // Net Profit Chart
-        new Chart(document.getElementById("profitChart"), {
-            type: "bar",
-            data: {
-                labels: years,
-                datasets: [{
-                    label: "Net Profit",
-                    data: profits
-                }]
-            }
-        });
+        );
 
-        // ROE Chart
-        new Chart(document.getElementById("roeChart"), {
-            type: "line",
-            data: {
-                labels: years,
-                datasets: [{
-                    label: "ROE %",
-                    data: roe,
-                    borderWidth: 3,
-                    fill: false
-                }]
-            }
-        });
+    }
 
-        // Free Cash Flow Chart
-        new Chart(document.getElementById("fcfChart"), {
-            type: "bar",
-            data: {
-                labels: years,
-                datasets: [{
-                    label: "Free Cash Flow",
-                    data: freeCashFlow
-                }]
-            }
-        });
+    catch (error) {
 
-    } catch (error) {
         console.error(error);
-        alert("Error loading financial data.");
+
+        showAlert("Error loading financial ratios.", "danger");
+
+    }
+
+    finally {
+
+        hideLoader();
+
     }
 
 }

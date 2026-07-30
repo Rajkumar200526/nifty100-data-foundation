@@ -1,24 +1,40 @@
-const API_URL = "http://127.0.0.1:8000";
-// Get company ID from URL
+
+console.log("compare.js loaded");
+checkAuth();
+
+const token = getToken();
+
 const urlParams = new URLSearchParams(window.location.search);
 const selectedCompany = urlParams.get("id");
 
 // Load companies into dropdowns
 async function loadCompanies() {
-    try {
-       const token = localStorage.getItem("token");
 
-       const response = await fetch(`${API_URL}/company-scores`, {
-        headers: {
-        "Authorization": `Bearer ${token}`
-    }
-});
+    console.log("loadCompanies() called");
+    showLoader();
+
+    try {
+
+        const response = await fetch(`${API}/company-scores`, {
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            showAlert("Unable to load companies.", "danger");
+            return;
+        }
+
         const companies = await response.json();
+        console.log("Companies:", companies);
 
         const company1 = document.getElementById("company1");
         const company2 = document.getElementById("company2");
 
+        company1.innerHTML = "";
+        company2.innerHTML = "";
+
         companies.forEach(company => {
+
             const option1 = document.createElement("option");
             option1.value = company.company_id;
             option1.textContent = company.company_name;
@@ -28,139 +44,164 @@ async function loadCompanies() {
             option2.value = company.company_id;
             option2.textContent = company.company_name;
             company2.appendChild(option2);
+
         });
 
-        // Default selection
-   if (selectedCompany) {
-    company1.value = selectedCompany;
+        if (selectedCompany) {
 
-    // Select the first different company for Company 2
-    for (let i = 0; i < company2.options.length; i++) {
-        if (company2.options[i].value !== selectedCompany) {
-            company2.selectedIndex = i;
-            break;
+            company1.value = selectedCompany;
+
+            for (let i = 0; i < company2.options.length; i++) {
+
+                if (company2.options[i].value !== selectedCompany) {
+
+                    company2.selectedIndex = i;
+                    break;
+
+                }
+
+            }
+
+        } else {
+
+            company1.selectedIndex = 0;
+
+            if (company2.options.length > 1) {
+                company2.selectedIndex = 1;
+            }
+
         }
-    }
-} else {
-    company1.selectedIndex = 0;
-    company2.selectedIndex = 1;
-}
-// Automatically compare after selecting companies
-compareCompanies();
+
+        compareCompanies();
 
     } catch (err) {
+
         console.error(err);
+
+        showAlert("Error loading companies.", "danger");
+
+    } finally {
+
+        hideLoader();
+
     }
+
 }
 
 // Compare companies
 async function compareCompanies() {
-    const token = localStorage.getItem("token");
 
-    const id1 = document.getElementById("company1").value;
-    const id2 = document.getElementById("company2").value;
+    showLoader();
 
-    if (id1 === id2) {
-        alert("Please select two different companies.");
-        return;
-    }
+    try {
 
-    const response = await fetch(
-    `${API_URL}/compare?company1=${id1}&company2=${id2}`,
-    {
-        headers: {
-            Authorization: `Bearer ${token}`
+        const id1 = document.getElementById("company1").value;
+        const id2 = document.getElementById("company2").value;
+
+        if (id1 === id2) {
+            showAlert("Please select two different companies.", "warning");
+            return;
         }
+
+        const response = await fetch(
+            `${API}/compare?company1=${id1}&company2=${id2}`,
+            {
+                headers: getAuthHeaders()
+            }
+        );
+
+        if (!response.ok) {
+            showAlert("Unable to compare companies.", "danger");
+            return;
+        }
+
+        const data = await response.json();
+        console.log("Compare:", data);
+        console.log("Compare API Response:", data);
+
+        if (!Array.isArray(data) || data.length < 2) {
+            showAlert("Comparison data not found.", "warning");
+            return;
+        }
+
+        const companyA = data[0];
+        const companyB = data[1];
+
+        document.getElementById("companyName1").innerText = companyA.company_name;
+        document.getElementById("companyName2").innerText = companyB.company_name;
+
+        const sales1 = document.getElementById("sales1");
+        const sales2 = document.getElementById("sales2");
+
+        sales1.innerText = Number(companyA.sales).toLocaleString();
+        sales2.innerText = Number(companyB.sales).toLocaleString();
+
+        const profit1 = document.getElementById("profit1");
+        const profit2 = document.getElementById("profit2");
+
+        profit1.innerText = Number(companyA.net_profit).toLocaleString();
+        profit2.innerText = Number(companyB.net_profit).toLocaleString();
+
+        const roe1 = document.getElementById("roe1");
+        const roe2 = document.getElementById("roe2");
+
+        roe1.innerText = companyA.roe != null
+            ? Number(companyA.roe).toFixed(2)
+            : "N/A";
+
+        roe2.innerText = companyB.roe != null
+            ? Number(companyB.roe).toFixed(2)
+            : "N/A";
+
+       const roce1 = document.getElementById("roce1");
+const roce2 = document.getElementById("roce2");
+
+roce1.innerText = companyA.roce != null
+    ? Number(companyA.roce).toFixed(2)
+    : "N/A";
+
+roce2.innerText = companyB.roce != null
+    ? Number(companyB.roce).toFixed(2)
+    : "N/A";
+
+        const debt1 = document.getElementById("debt1");
+        const debt2 = document.getElementById("debt2");
+
+        debt1.innerText = companyA.debt_to_equity != null
+            ? Number(companyA.debt_to_equity).toFixed(2)
+            : "N/A";
+
+        debt2.innerText = companyB.debt_to_equity != null
+            ? Number(companyB.debt_to_equity).toFixed(2)
+            : "N/A";
+
+        drawChart(companyA, companyB);
+
+        showWinner(companyA, companyB);
+
+        highlightWinner(companyA, companyB);
+
+    } catch (error) {
+
+        console.error(error);
+
+        showAlert("Error comparing companies.", "danger");
+
+    } finally {
+
+        hideLoader();
+
     }
-);
-    if (!response.ok) {
-    alert("Unable to compare companies.");
-    return;
+
 }
 
-const data = await response.json();
-if (!Array.isArray(data) || data.length < 2) {
-    alert("Comparison data not found.");
-    return;
-}
+// ===============================
+// Draw Comparison Chart
+// ===============================
 
-    const companyA = data[0];
-    const companyB = data[1];
+let chart = null;
+let ratioChart = null;
 
-    document.getElementById("companyName1").innerText = companyA.company_name;
-    document.getElementById("companyName2").innerText = companyB.company_name;
-// =========================
-// Sales
-// =========================
-const sales1 = document.getElementById("sales1");
-const sales2 = document.getElementById("sales2");
-
-sales1.innerText = Number(companyA.sales).toLocaleString();
-sales2.innerText = Number(companyB.sales).toLocaleString();
-
-// =========================
-// Net Profit
-// =========================
-const profit1 = document.getElementById("profit1");
-const profit2 = document.getElementById("profit2");
-
-profit1.innerText = Number(companyA.net_profit).toLocaleString();
-profit2.innerText = Number(companyB.net_profit).toLocaleString();
-
-// =========================
-// ROE
-// =========================
-const roe1 = document.getElementById("roe1");
-const roe2 = document.getElementById("roe2");
-
-roe1.innerText = companyA.roe != null
-    ? Number(companyA.roe).toFixed(2)
-    : "N/A";
-
-roe2.innerText = companyB.roe != null
-    ? Number(companyB.roe).toFixed(2)
-    : "N/A";
-
-// =========================
-// ROA
-// =========================
-const roa1 = document.getElementById("roa1");
-const roa2 = document.getElementById("roa2");
-
-roa1.innerText = companyA.roa != null
-    ? Number(companyA.roa).toFixed(2)
-    : "N/A";
-
-roa2.innerText = companyB.roa != null
-    ? Number(companyB.roa).toFixed(2)
-    : "N/A";
-
-// =========================
-// Debt to Equity
-// =========================
-const debt1 = document.getElementById("debt1");
-const debt2 = document.getElementById("debt2");
-
-debt1.innerText = companyA.debt_to_equity != null
-    ? Number(companyA.debt_to_equity).toFixed(2)
-    : "N/A";
-
-debt2.innerText = companyB.debt_to_equity != null
-    ? Number(companyB.debt_to_equity).toFixed(2)
-    : "N/A";
-
-// Draw Chart
-drawChart(companyA, companyB);
-
-// Winner Summary
-showWinner(companyA, companyB);
-
-// Highlight Better Values
-highlightWinner(companyA, companyB);
-}
-
-// Draw comparison chart
-let chart;
 
 function drawChart(companyA, companyB) {
 
@@ -169,112 +210,216 @@ function drawChart(companyA, companyB) {
     if (chart) {
         chart.destroy();
     }
+    if (ratioChart) {
+    ratioChart.destroy();
+}
 
     chart = new Chart(ctx, {
+
         type: "bar",
+
         data: {
+
             labels: [
                 "Sales",
                 "Net Profit",
-                "ROE",
-                "ROCE",
                 "Free Cash Flow"
             ],
+
             datasets: [
+
                 {
                     label: companyA.company_name,
                     data: [
-                        companyA.sales,
-                        companyA.net_profit,
-                        companyA.roe,
-                        companyA.roce,
-                        companyA.free_cash_flow
+                        companyA.sales ?? 0,
+                        companyA.net_profit ?? 0,
+                        companyA.free_cash_flow ?? 0
                     ]
                 },
+
                 {
                     label: companyB.company_name,
                     data: [
-                        companyB.sales,
-                        companyB.net_profit,
-                        companyB.roe,
-                        companyB.roce,
-                        companyB.free_cash_flow
+                        companyB.sales ?? 0,
+                        companyB.net_profit ?? 0,
+                        companyB.free_cash_flow ?? 0
                     ]
                 }
+
             ]
+
         },
+
         options: {
-            responsive: true
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+
+                legend: {
+                    position: "top"
+                }
+
+            },
+
+            scales: {
+
+                y: {
+                    beginAtZero: true
+                }
+
+            }
+
         }
+
     });
+    const ratioCtx = document.getElementById("ratioChart");
+
+ratioChart = new Chart(ratioCtx, {
+
+    type: "bar",
+
+    data: {
+
+        labels: [
+            "ROE",
+            "ROCE",
+            "Debt / Equity"
+        ],
+
+        datasets: [
+
+            {
+                label: companyA.company_name,
+
+                data: [
+                    companyA.roe ?? 0,
+                    companyA.roce ?? 0,
+                    companyA.debt_to_equity ?? 0
+                ]
+            },
+
+            {
+                label: companyB.company_name,
+
+                data: [
+                    companyB.roe ?? 0,
+                    companyB.roce ?? 0,
+                    companyB.debt_to_equity ?? 0
+                ]
+            }
+
+        ]
+
+    },
+options: {
+
+    responsive: true,
+
+    maintainAspectRatio: false,
+
+    plugins: {
+
+        legend: {
+            position: "top"
+        }
+
+    },
+
+    scales: {
+
+        y: {
+            beginAtZero: true
+        }
+
+    }
+
 }
+
+});
+}
+
+
+// ===============================
+// Winner Summary
+// ===============================
+
 function showWinner(companyA, companyB) {
 
     let scoreA = 0;
     let scoreB = 0;
 
-    // Sales
-    if (companyA.sales > companyB.sales) {
+    const winnerSales = document.getElementById("winnerSales");
+    const winnerProfit = document.getElementById("winnerProfit");
+    const winnerROE = document.getElementById("winnerROE");
+    const winnerDebt = document.getElementById("winnerDebt");
+    const overallWinner = document.getElementById("overallWinner");
+
+    // Higher Sales
+    if ((companyA.sales ?? 0) > (companyB.sales ?? 0)) {
         scoreA++;
-        document.getElementById("winnerSales").innerHTML =
+        winnerSales.innerHTML =
             `✅ Higher Sales : <b>${companyA.company_name}</b>`;
     } else {
         scoreB++;
-        document.getElementById("winnerSales").innerHTML =
+        winnerSales.innerHTML =
             `✅ Higher Sales : <b>${companyB.company_name}</b>`;
     }
 
-    // Net Profit
-    if (companyA.net_profit > companyB.net_profit) {
+    // Higher Profit
+    if ((companyA.net_profit ?? 0) > (companyB.net_profit ?? 0)) {
         scoreA++;
-        document.getElementById("winnerProfit").innerHTML =
+        winnerProfit.innerHTML =
             `✅ Higher Net Profit : <b>${companyA.company_name}</b>`;
     } else {
         scoreB++;
-        document.getElementById("winnerProfit").innerHTML =
+        winnerProfit.innerHTML =
             `✅ Higher Net Profit : <b>${companyB.company_name}</b>`;
     }
 
-    // ROE
-    if (companyA.roe > companyB.roe) {
+    // Better ROE
+    if ((companyA.roe ?? 0) > (companyB.roe ?? 0)) {
         scoreA++;
-        document.getElementById("winnerROE").innerHTML =
+        winnerROE.innerHTML =
             `✅ Better ROE : <b>${companyA.company_name}</b>`;
     } else {
         scoreB++;
-        document.getElementById("winnerROE").innerHTML =
+        winnerROE.innerHTML =
             `✅ Better ROE : <b>${companyB.company_name}</b>`;
     }
 
-    // Debt (Lower is better)
-    if (companyA.debt_to_equity < companyB.debt_to_equity) {
+    // Lower Debt
+    if ((companyA.debt_to_equity ?? 9999) < (companyB.debt_to_equity ?? 9999)) {
         scoreA++;
-        document.getElementById("winnerDebt").innerHTML =
+        winnerDebt.innerHTML =
             `✅ Lower Debt : <b>${companyA.company_name}</b>`;
     } else {
         scoreB++;
-        document.getElementById("winnerDebt").innerHTML =
+        winnerDebt.innerHTML =
             `✅ Lower Debt : <b>${companyB.company_name}</b>`;
     }
 
     if (scoreA > scoreB) {
-        document.getElementById("overallWinner").innerHTML =
-            `🏆 Overall Winner : ${companyA.company_name}`;
+        overallWinner.innerHTML =
+            `🏆 Overall Winner : <b>${companyA.company_name}</b>`;
     }
     else if (scoreB > scoreA) {
-        document.getElementById("overallWinner").innerHTML =
-            `🏆 Overall Winner : ${companyB.company_name}`;
+        overallWinner.innerHTML =
+            `🏆 Overall Winner : <b>${companyB.company_name}</b>`;
     }
     else {
-        document.getElementById("overallWinner").innerHTML =
-            "🤝 Overall Result : Tie";
+        overallWinner.innerHTML =
+            `🤝 Overall Result : <b>Tie</b>`;
     }
-}
-function highlightWinner(companyA, companyB) {
-    const roa1 = document.getElementById("roa1");
-    const roa2 = document.getElementById("roa2");
 
-    // Get table cells
+}
+// ===============================
+// Highlight Winner
+// ===============================
+function highlightWinner(companyA, companyB) {
+
     const sales1 = document.getElementById("sales1");
     const sales2 = document.getElementById("sales2");
 
@@ -284,22 +429,25 @@ function highlightWinner(companyA, companyB) {
     const roe1 = document.getElementById("roe1");
     const roe2 = document.getElementById("roe2");
 
+ const roce1 = document.getElementById("roce1");
+const roce2 = document.getElementById("roce2");
+
     const debt1 = document.getElementById("debt1");
     const debt2 = document.getElementById("debt2");
 
-    // Remove old colors
-    [
+   [
     sales1, sales2,
     profit1, profit2,
     roe1, roe2,
-    roa1, roa2,
+    roce1, roce2,
     debt1, debt2
 ].forEach(cell => {
+    if (cell) {
         cell.classList.remove("table-success", "table-danger");
-    });
-
-    // Sales (Higher is better)
-    if (companyA.sales > companyB.sales) {
+    }
+});
+    // Sales
+    if ((companyA.sales ?? 0) > (companyB.sales ?? 0)) {
         sales1.classList.add("table-success");
         sales2.classList.add("table-danger");
     } else {
@@ -307,8 +455,8 @@ function highlightWinner(companyA, companyB) {
         sales1.classList.add("table-danger");
     }
 
-    // Net Profit (Higher is better)
-    if (companyA.net_profit > companyB.net_profit) {
+    // Net Profit
+    if ((companyA.net_profit ?? 0) > (companyB.net_profit ?? 0)) {
         profit1.classList.add("table-success");
         profit2.classList.add("table-danger");
     } else {
@@ -316,34 +464,48 @@ function highlightWinner(companyA, companyB) {
         profit1.classList.add("table-danger");
     }
 
-    // ROE (Higher is better)
-    if (companyA.roe > companyB.roe) {
+    // ROE
+    if ((companyA.roe ?? 0) > (companyB.roe ?? 0)) {
         roe1.classList.add("table-success");
         roe2.classList.add("table-danger");
     } else {
         roe2.classList.add("table-success");
         roe1.classList.add("table-danger");
     }
-    // ROA (Higher is better)
-if ((companyA.roa ?? 0) > (companyB.roa ?? 0)) {
-    roa1.classList.add("table-success");
-    roa2.classList.add("table-danger");
+
+    // ROCE
+if ((companyA.roce ?? 0) > (companyB.roce ?? 0)) {
+    roce1.classList.add("table-success");
+    roce2.classList.add("table-danger");
 } else {
-    roa2.classList.add("table-success");
-    roa1.classList.add("table-danger");
+    roce2.classList.add("table-success");
+    roce1.classList.add("table-danger");
 }
 
-    // Debt to Equity (Lower is better)
-    if (companyA.debt_to_equity < companyB.debt_to_equity) {
+    // Debt (Lower is better)
+    if ((companyA.debt_to_equity ?? 9999) < (companyB.debt_to_equity ?? 9999)) {
         debt1.classList.add("table-success");
         debt2.classList.add("table-danger");
     } else {
         debt2.classList.add("table-success");
         debt1.classList.add("table-danger");
     }
+
 }
+
+// ===============================
+// Initialize
+// ===============================
 
 loadCompanies();
 
-document.getElementById("company1").addEventListener("change", compareCompanies);
-document.getElementById("company2").addEventListener("change", compareCompanies);
+const company1Select = document.getElementById("company1");
+const company2Select = document.getElementById("company2");
+
+if (company1Select) {
+    company1Select.addEventListener("change", compareCompanies);
+}
+
+if (company2Select) {
+    company2Select.addEventListener("change", compareCompanies);
+}

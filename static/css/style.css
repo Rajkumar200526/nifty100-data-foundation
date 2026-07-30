@@ -1,0 +1,45 @@
+body{
+    background:#f4f6f9;
+    font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;
+}
+
+.navbar{
+    box-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+
+.card{
+    border:none;
+    border-radius:12px;
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 12px 20px rgba(0,0,0,.15);
+}
+
+.btn{
+    border-radius:8px;
+}
+
+.table{
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.footer{
+    margin-top:40px;
+    padding:15px;
+    background:#212529;
+    color:white;
+    text-align:center;
+}
+
+.loader{
+    display:none;
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    z-index:9999;
+}

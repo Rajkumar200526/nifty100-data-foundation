@@ -1,131 +1,175 @@
 # 📈 N100 Financial Intelligence Platform
 
-## Overview
-
-The **N100 Financial Intelligence Platform** is an AI-powered financial analytics platform that helps investors analyze companies using financial statements, stock trends, machine learning, and portfolio recommendations.
-
-It provides a modern REST API built with FastAPI and includes interactive dashboards, clustering analysis, and financial insights.
+An AI-powered financial analytics platform built using **FastAPI**, **SQLite**, **HTML**, **Bootstrap**, and **JavaScript** for analyzing Nifty 100 companies. The platform provides company analysis, financial ratios, sector analytics, portfolio management, AI-driven insights, and company comparison dashboards.
 
 ---
 
-# Features
+## 🚀 Features
 
-### Authentication
-- JWT Login
-- Secure API Access
+### 🔐 User Authentication
+- User Registration
+- User Login
+- JWT Authentication
+- Protected API Endpoints
 
-### Company Analytics
-- Company Dashboard
-- Company Search
-- Company Details
-- Financial Ratios
-- Financial Summary
-- Financial Trends
+### 📊 Dashboard
+- Total Companies
+- Total Sectors
+- Top Performing Companies
+- Investment Score Overview
+- Interactive Charts
 
-### Portfolio Analytics
-- Portfolio Recommendation
+### 🏢 Company Analysis
+- Company Information
+- Market Capitalization
+- Industry & Sector Details
+- Investment Score
+- Recommendation
+- Company Rank
+
+### 📉 Financial Ratios
+- Return on Equity (ROE)
+- Return on Assets (ROA)
+- Return on Capital Employed (ROCE)
+- Debt-to-Equity Ratio
+- Free Cash Flow
+
+### 📊 Sector Analytics
+- Sector-wise Performance
+- Average Investment Score
+- Average ROE
+- Average ROCE
+- Company Count
+- Sector Comparison Charts
+
+### ⚖️ Company Comparison
+Compare two companies using:
+
+- Sales
+- Net Profit
+- Free Cash Flow
+- ROE
+- ROCE
+- Debt-to-Equity
+
+Includes:
+- Financial Performance Comparison Chart
+- Financial Ratio Comparison Chart
+
+### 💼 Portfolio Management
+- Add Companies
+- Remove Companies
 - Portfolio Summary
-- Portfolio Statistics
+- Portfolio Health Analysis
+- Portfolio Performance Charts
 
-### Machine Learning
-- K-Means Company Clustering
-- Cluster Profiling
-- Correlation Heatmap
-- Outlier Detection
+### 🤖 AI Portfolio Insights
+- Portfolio Health Score
+- Investment Suggestions
+- Risk Analysis
+- Portfolio Recommendations
 
-### Stock Analysis
-- Stock Trend API
-- Historical Price Visualization
-
-### REST APIs
-- FastAPI
-- Swagger UI
-- OpenAPI Documentation
-- Health Check API
-
-### Testing
-- Pytest
-- HTML Test Report
+### ⭐ Recommendation Engine
+- Buy Recommendations
+- Hold Recommendations
+- Investment Scores
+- Company Rankings
 
 ---
 
-# Technology Stack
+# 🛠️ Tech Stack
+
+## Frontend
+- HTML5
+- CSS3
+- Bootstrap 5
+- JavaScript
+- Chart.js
 
 ## Backend
-
-- Python
 - FastAPI
+- Python
+
+## Database
 - SQLite
 
-## Machine Learning
-
-- Scikit-learn
+## Data Processing
 - Pandas
 - NumPy
 
-## Visualization
-
-- Matplotlib
-- Chart.js
-
-## Frontend
-
-- HTML
-- Bootstrap
-- JavaScript
-
 ---
 
-# Project Structure
+# 📁 Project Structure
 
 ```
-nifty100-data-foundation
+nifty100-data-foundation/
 │
-├── db
-├── docs
-├── output
-├── reports
-├── src
-│   ├── api
-│   ├── auth
-│   └── analytics
-├── static
-├── templates
-├── tests
-└── README.md
+├── frontend/
+│   ├── css/
+│   ├── js/
+│   ├── images/
+│   ├── login.html
+│   ├── dashboard.html
+│   ├── companies.html
+│   ├── company.html
+│   ├── compare.html
+│   ├── portfolio.html
+│   ├── recommendation.html
+│   └── sector.html
+│
+├── output/
+│   └── company_scores.csv
+│
+├── src/
+│   ├── api/
+│   ├── auth/
+│   ├── database/
+│   ├── models/
+│   └── services/
+│
+├── tests/
+├── requirements.txt
+├── README.md
+└── .gitignore
 ```
 
 ---
 
-# Installation
+# ⚙️ Installation
 
-Clone the repository
+## Clone Repository
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/nifty100-data-foundation.git
 ```
 
-Move into the project
+---
+
+## Navigate to Project
 
 ```bash
 cd nifty100-data-foundation
 ```
 
-Create a virtual environment
+---
 
-```bash
-python -m venv venv
-```
-
-Activate it
+## Create Virtual Environment
 
 Windows
 
 ```bash
-venv\Scripts\activate
+python -m venv .venv
 ```
 
-Install dependencies
+Activate
+
+```bash
+.venv\Scripts\activate
+```
+
+---
+
+## Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -133,13 +177,19 @@ pip install -r requirements.txt
 
 ---
 
-# Run the Project
+## Start Backend
 
 ```bash
 uvicorn src.api.main:app --reload
 ```
 
-Open:
+Backend URL
+
+```
+http://127.0.0.1:8000
+```
+
+Swagger API
 
 ```
 http://127.0.0.1:8000/docs
@@ -147,100 +197,138 @@ http://127.0.0.1:8000/docs
 
 ---
 
-# API Modules
+## Start Frontend
+
+Open the frontend using **Live Server** in VS Code.
+
+Example:
+
+```
+http://127.0.0.1:5500/frontend/login.html
+```
+
+---
+
+# 📊 APIs
 
 - Authentication
 - Dashboard
 - Companies
-- Search
+- Company Details
 - Financial Ratios
-- Financial Trends
+- Compare Companies
 - Sector Analytics
-- Company Comparison
+- Recommendation
 - Portfolio
-- Analytics
-- Stock Trends
-- Health
+- Portfolio Health
+- Portfolio Insights
 
 ---
 
-# Machine Learning
+# 📷 Screenshots
 
-- K-Means Clustering
-- Correlation Analysis
-- Outlier Detection
-- Portfolio Statistics
+Add screenshots here:
+
+# 📷 Screenshots
+---
+## Create Account
+
+![Create Account](screenshots/Create-Account.png)
 
 ---
 
-# Testing
+## Login Page
 
-Run
-
-```bash
-python -m pytest tests/api -v
-```
-
-Generate HTML Report
-
-```bash
-python -m pytest tests/api --html=reports/pytest_report.html --self-contained-html
-```
+![Login](screenshots/login.png)
 
 ---
 
-# Project Outputs
+## Dashboard
 
-- company_scores.csv
-- cluster_labels.csv
-- cluster_profile.csv
-- recommended_portfolio.csv
-- portfolio_summary.csv
-- portfolio_statistics.csv
-- outlier_report.csv
-- correlation_heatmap.png
-- elbow_plot.png
+![Dashboard](screenshots/dashboard.png)
+
+---
+##  Companies
+
+![Companies](screenshots/Companies.png)
 
 ---
 
-# API Documentation
+## Company Analysis
 
-Swagger UI
-
-```
-http://127.0.0.1:8000/docs
-```
-
-Health API
-
-```
-GET /health
-```
+![Company Analysis](screenshots/company-analysis.png)
 
 ---
 
-# Future Enhancements
+## Financial Ratios
 
-- AI Investment Advisor
-- Stock Price Prediction using LSTM
+![Financial Ratios](screenshots/financial-ratios.png)
+
+---
+
+## Compare Companies
+
+![Compare](screenshots/compare.png)
+
+---
+
+## Portfolio
+
+![Portfolio](screenshots/portfolio.png)
+
+---
+
+## Sector Analytics
+
+![Sector Analytics](screenshots/sector.png)
+
+---
+
+## Recommendation
+
+![Recommendation](screenshots/recommendation.png)
+
+---
+
+# 🎯 Future Enhancements
+
+- Live Stock Market Data
+- Real-Time Price Tracking
+- AI Chat Assistant
 - News Sentiment Analysis
-- Real-time NSE/BSE Data Integration
-- Risk Analysis Dashboard
+- Stock Price Prediction
+- Watchlist
+- Email Alerts
+- Cloud Deployment
 - Mobile Application
-- Cloud Deployment (AWS/Azure)
 
 ---
 
-# Author
+# 👨‍💻 Developed By
 
-**Rajkumar Ampolu**
+**AMPOLU RAJ KUMAR**
 
-B.Tech Computer Science & Engineering (AI & ML)
-
-SRGEC
+B.Tech Computer Science Engineering (Artificial Intelligence & Machine Learning)
+SRGEC 
 
 ---
 
-# License
+# 📜 License
 
-This project is developed for academic and learning purposes.
+This project is developed for educational and academic purposes.
+
+---
+
+# ⭐ Acknowledgements
+
+- FastAPI
+- Bootstrap
+- Chart.js
+- SQLite
+- Pandas
+- NumPy
+- Nifty 100 Dataset
+
+---
+
+## ⭐ If you like this project, don't forget to Star the repository!

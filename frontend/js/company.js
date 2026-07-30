@@ -1,62 +1,131 @@
-const API = "http://127.0.0.1:8000";
 
 
-const token = localStorage.getItem("token");
+checkAuth();
 
-// If user is not logged in
-if (!token) {
-    window.location.href = "login.html";
+const token = getToken();
+
+const params = new URLSearchParams(window.location.search);
+const companyId = params.get("id");
+const portfolioBtn = document.getElementById("portfolioBtn");
+
+portfolioBtn.addEventListener("click", addToPortfolio);
+const recommendationBtn = document.getElementById("recommendationBtn");
+
+if (recommendationBtn) {
+    recommendationBtn.href = `recommendation.html?id=${companyId}`;
 }
 
-// Get company ID from URL
-// Get company ID from URL
-const params = new URLSearchParams(window.location.search);
+if (!companyId) {
+    showAlert("Company ID not found.", "warning");
 
-const companyId = params.get("id");
+    setTimeout(() => {
+        window.location.href = "dashboard.html";
+    }, 1500);
 
-// Set Compare button link
-document.getElementById("compareLink").href =
-    `compare.html?id=${companyId}`;
+    throw new Error("Missing company id");
+}
 
-// Load company details
+// Set button links
+document.getElementById("compareLink").href = `compare.html?id=${companyId}`;
+document.getElementById("ratioLink").href = `ratios.html?id=${companyId}`;
+
 async function loadCompany() {
 
-    const response = await fetch(`${API}/company/${companyId}`, {
+    showLoader();
 
-        headers: {
-            "Authorization": `Bearer ${token}`
+    try {
+
+      const response = await fetch(`${API}/companies/${companyId}`, {
+    headers: getAuthHeaders()
+});
+
+        if (!response.ok) {
+
+            showAlert("Unable to load company details.", "danger");
+
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 1500);
+
+            return;
         }
 
-    });
+        const company = await response.json();
 
-    if (!response.ok) {
+        // Main Card
+        document.getElementById("companyName").textContent =
+            company.company_name;
 
-        alert("Unable to load company.");
+        document.getElementById("sector").textContent =
+            company.broad_sector;
 
-        window.location.href = "dashboard.html";
+        document.getElementById("score").textContent =
+            company.investment_score;
 
-        return;
+        document.getElementById("recommendation").textContent =
+    company.recommendation;
+
+document.getElementById("rank").textContent =
+    company.rank;
+
+        // Summary Table
+        document.getElementById("companyNameTable").textContent =
+            company.company_name;
+
+        document.getElementById("sectorTable").textContent =
+            company.broad_sector;
+
+        document.getElementById("scoreTable").textContent =
+            company.investment_score;
+
+        document.getElementById("recommendationTable").textContent =
+    company.recommendation;
+
+document.getElementById("rankTable").textContent =
+    company.rank;
+
+    } catch (error) {
+
+        console.error(error);
+
+        showAlert("Server connection failed.", "danger");
+
+    } finally {
+
+        hideLoader();
+
     }
-
-    const company = await response.json();
-
-    document.getElementById("companyName").innerHTML =
-        company.company_name;
-
-    document.getElementById("sector").innerHTML =
-        company.broad_sector;
-
-    document.getElementById("score").innerHTML =
-        company.investment_score;
-
-    document.getElementById("recommendation").innerHTML =
-        company.Recommendation;
-
-    document.getElementById("rank").innerHTML =
-        company.Rank;
-        document.getElementById("ratioLink").href =
-    `ratios.html?id=${companyId}`;
 
 }
 
+
 loadCompany();
+async function addToPortfolio(event) {
+
+    event.preventDefault();
+
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+
+        `${API}/portfolio/${companyId}`,
+
+        {
+
+            method: "POST",
+
+            headers: {
+
+                "Authorization": `Bearer ${token}`
+
+            }
+
+        }
+
+    );
+
+    const result = await response.json();
+
+    alert(result.message);
+
+}

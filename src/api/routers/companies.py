@@ -1,5 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from src.api.database import get_connection
+import pandas as pd
+from pathlib import Path
 
 router = APIRouter()
 
@@ -41,7 +43,6 @@ def get_company(company_id: int):
     """, (company_id,))
 
     row = cursor.fetchone()
-
     conn.close()
 
     if row is None:
@@ -50,4 +51,20 @@ def get_company(company_id: int):
             detail="Company not found"
         )
 
-    return dict(row)
+    company = dict(row)
+
+    csv_path = Path("output/company_scores.csv")
+
+    if csv_path.exists():
+
+        df = pd.read_csv(csv_path)
+
+        score = df[df["company_id"] == company_id]
+
+        if not score.empty:
+
+            company["investment_score"] = float(score.iloc[0]["Investment Score"])
+            company["recommendation"] = score.iloc[0]["Recommendation"]
+            company["rank"] = int(score.iloc[0]["Rank"])
+
+    return company

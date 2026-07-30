@@ -12,17 +12,30 @@ def sector_analysis():
 
     cursor.execute("""
         SELECT
-            broad_sector,
-            COUNT(*) AS total_companies
-        FROM companies
-        GROUP BY broad_sector
-        ORDER BY total_companies DESC
+            c.broad_sector AS sector,
+            COUNT(DISTINCT c.company_id) AS companies,
+            AVG(fr.sales) AS avg_sales,
+            AVG(fr.net_profit) AS avg_profit,
+            AVG(fr.roe) AS avg_roe
+        FROM companies c
+        JOIN financial_ratios fr
+            ON c.company_id = fr.company_id
+        GROUP BY c.broad_sector
+        ORDER BY companies DESC
     """)
 
-    data = [
-        dict(row)
-        for row in cursor.fetchall()
-    ]
+    rows = cursor.fetchall()
+
+    data = []
+
+    for row in rows:
+        data.append({
+            "sector": row["sector"],
+            "companies": row["companies"],
+            "avg_sales": round(row["avg_sales"], 2),
+            "avg_profit": round(row["avg_profit"], 2),
+            "avg_roe": round(row["avg_roe"], 2)
+        })
 
     conn.close()
 
