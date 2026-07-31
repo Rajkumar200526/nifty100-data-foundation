@@ -19,6 +19,7 @@ async function loadPortfolio() {
         }
 
         const data = await response.json();
+        alert(JSON.stringify(data, null, 2));
 
         // =============================
         // Summary Cards
@@ -120,7 +121,7 @@ async function loadPortfolio() {
         showAlert("Unable to load portfolio.", "danger");
 
     }
-document.getElementById("portfolioTable").innerHTML = html;
+
 }
 
     // =============================
