@@ -38,7 +38,7 @@ async function loadRecommendation() {
         }
 
         const data = await response.json();
-        alert(JSON.stringify(data, null, 2));
+        
 
         document.getElementById("companyName").textContent =
             data.company_name;
