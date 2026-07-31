@@ -1,3 +1,4 @@
+alert("portfolio.js loaded");
 checkAuth();
 
 let sectorChart = null;
