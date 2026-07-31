@@ -3,7 +3,7 @@ checkAuth();
 let chart = null;
 let sectorData = [];
 
-Chart.register(ChartDataLabels);
+//Chart.register(ChartDataLabels);
 
 async function loadSectorAnalytics() {
 
@@ -154,31 +154,6 @@ function drawChart(labels, values) {
 
                 },
 
-                datalabels: {
-
-                    color: "#fff",
-
-                    font: {
-
-                        weight: "bold",
-
-                        size: 14
-
-                    },
-
-                    formatter: (value, context) => {
-
-                        const values =
-                            context.chart.data.datasets[0].data;
-
-                        const total =
-                            values.reduce((a, b) => a + b, 0);
-
-                        return ((value / total) * 100).toFixed(1) + "%";
-
-                    }
-
-                }
 
             }
 
