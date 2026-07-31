@@ -120,9 +120,9 @@ async function loadPortfolio() {
         showAlert("Unable to load portfolio.", "danger");
 
     }
-
-}
 document.getElementById("portfolioTable").innerHTML = html;
+}
+
     // =============================
     // // =============================
 // Charts
