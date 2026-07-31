@@ -94,7 +94,7 @@ async function loadCompanies() {
 // Display Table
 // ---------------------
 function displayCompanies(data) {
-    alert(JSON.stringify(data[0], null, 2));
+    
 
     let html = "";
 
