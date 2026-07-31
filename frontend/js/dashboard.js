@@ -102,18 +102,18 @@ function displayCompanies(data) {
         html += `
         <tr>
 
-            <td>${company.rank ?? "-"}</td>
+            <td>${company.Rank}</td>
 
             <td>
                 <a href="company.html?id=${company.company_id}"
-                class="text-decoration-none fw-bold">
+                   class="text-decoration-none fw-bold">
                     ${company.company_name}
                 </a>
             </td>
 
             <td>${company.broad_sector}</td>
 
-            <td>${Number(company.investment_score ?? 0).toFixed(2)}</td>
+            <td>${Number(company["Investment Score"]).toFixed(2)}</td>
 
         </tr>
         `;
@@ -123,22 +123,6 @@ function displayCompanies(data) {
     document.getElementById("companyTable").innerHTML = html;
 
 }
-
-// ---------------------
-// Search
-// ---------------------
-document.getElementById("searchBox").addEventListener("keyup", function () {
-
-    const search = this.value.toLowerCase();
-
-    const filtered = companyData.filter(company =>
-        company.company_name.toLowerCase().includes(search)
-    );
-
-    displayCompanies(filtered);
-
-});
-
 // ---------------------
 // Logout
 // ---------------------
