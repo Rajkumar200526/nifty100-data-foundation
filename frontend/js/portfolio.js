@@ -115,21 +115,7 @@ async function loadPortfolio() {
 
         document.getElementById("portfolioTable").innerHTML =
             html;
-
-   } catch (error) {
-
-    console.error(error);
-
-    showAlert("Unable to load portfolio.", "danger");
-
-}
-
-// Charts
-
-// Charts
-
-    // =============================
-    // // =============================
+            // =============================
 // Charts
 // =============================
 
@@ -146,20 +132,6 @@ sectorChart = new Chart(
                 data: Object.values(sectors),
                 borderWidth: 1
             }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: "bottom",
-                    labels: {
-                        font: {
-                            size: 14
-                        }
-                    }
-                }
-            }
         }
     }
 );
@@ -172,27 +144,23 @@ scoreChart = new Chart(
             labels: data.map(c => c.company_name),
             datasets: [{
                 label: "Investment Score",
-                data: data.map(c => Number(c.investment_score || 0)),
-                borderWidth: 1
+                data: data.map(c => Number(c.investment_score || 0))
             }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100
-                }
-            }
         }
     }
 );
+
+   } catch (error) {
+
+    console.error(error);
+
+    showAlert("Unable to load portfolio.", "danger");
+
+}
+
+// Charts
+
+
 
 }
 // =============================
