@@ -113,7 +113,7 @@ function displayCompanies(data) {
 
             <td>${company.broad_sector}</td>
 
-            <td>${Number(company["Investment Score"]).toFixed(2)}</td>
+            <td>${Number(company.investment_score ?? 0).toFixed(2)}</td>
 
         </tr>
         `;
