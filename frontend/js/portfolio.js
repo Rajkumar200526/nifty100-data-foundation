@@ -40,6 +40,7 @@ async function loadPortfolio() {
                 (sectors[company.broad_sector] || 0) + 1;
 
         });
+        console.log(sectors);
 
         const avgScore =
             data.length > 0
