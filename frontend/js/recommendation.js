@@ -2,6 +2,11 @@ checkAuth();
 
 const params = new URLSearchParams(window.location.search);
 const companyId = params.get("id");
+const backButton = document.getElementById("backButton");
+
+if (backButton) {
+    backButton.href = `company.html?id=${companyId}`;
+}
 
 if (!companyId) {
 
