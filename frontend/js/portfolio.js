@@ -115,15 +115,17 @@ async function loadPortfolio() {
         document.getElementById("portfolioTable").innerHTML =
             html;
 
-    } catch (error) {
+   } catch (error) {
 
-        console.error(error);
+    console.error(error);
 
-        showAlert("Unable to load portfolio.", "danger");
-
-    }
+    showAlert("Unable to load portfolio.", "danger");
 
 }
+
+// Charts
+
+// Charts
 
     // =============================
     // // =============================
@@ -191,7 +193,7 @@ scoreChart = new Chart(
     }
 );
 
-
+}
 // =============================
 // Remove Company
 // =============================
