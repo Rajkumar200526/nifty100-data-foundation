@@ -1,5 +1,6 @@
 
-window.API = "https://nifty-financial-analytics-platform-ikzb.onrender.com";
+const API = "https://nifty-financial-analytics-platform-ikzb.onrender.com";
+window.API = API;
 // --;--------------------
 // Authentication
 // ----------------------

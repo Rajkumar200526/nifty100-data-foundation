@@ -23,7 +23,7 @@ async function loadSectorAnalytics() {
 
     try {
 
-        const response = await fetch(`${API_URL}/sector-analysis`, {
+        const response = await fetch(`${API}/sector-analysis`, {
     headers: getAuthHeaders()
 });
 
