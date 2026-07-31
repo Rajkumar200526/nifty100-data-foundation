@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8000";
+const API = "https://nifty-financial-analytics-platform-ikzb.onrender.com";
 function showLoader() {
     console.log("Loading...");
 }
