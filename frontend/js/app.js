@@ -1,14 +1,24 @@
+checkAuth();
 
+fetch(window.API + "/company-scores", {
+    headers: getAuthHeaders()
+})
+.then(res => {
 
-fetch(API + "/company-scores")
-.then(res => res.json())
+    if (!res.ok) {
+        throw new Error("Unable to load company scores");
+    }
+
+    return res.json();
+
+})
 .then(data => {
 
     document.getElementById("companies").innerHTML = data.length;
 
     let total = 0;
     let max = 0;
-    let min = 999;
+    let min = Number.MAX_VALUE;
 
     let rows = "";
 
@@ -20,45 +30,44 @@ fetch(API + "/company-scores")
 
     data.forEach(item => {
 
-        total += item["Investment Score"];
+        const score = Number(item.investment_score ?? 0);
 
-        if(item["Investment Score"] > max)
-            max = item["Investment Score"];
+        total += score;
 
-        if(item["Investment Score"] < min)
-            min = item["Investment Score"];
+        if (score > max) max = score;
+        if (score < min) min = score;
 
         rows += `
         <tr>
-            <td>${item.Rank}</td>
+            <td>${item.rank ?? "-"}</td>
             <td>${item.company_name}</td>
             <td>${item.broad_sector}</td>
-            <td>${item["Investment Score"].toFixed(2)}</td>
-            <td>${item.Recommendation}</td>
+            <td>${score.toFixed(2)}</td>
+            <td>${item.recommendation ?? "-"}</td>
         </tr>
         `;
 
         labels.push(item.company_name);
-        values.push(item["Investment Score"]);
+        values.push(score);
 
         sectorData[item.broad_sector] =
             (sectorData[item.broad_sector] || 0) + 1;
 
-        recData[item.Recommendation] =
-            (recData[item.Recommendation] || 0) + 1;
+        recData[item.recommendation] =
+            (recData[item.recommendation] || 0) + 1;
 
     });
 
     document.getElementById("tableBody").innerHTML = rows;
 
     document.getElementById("avgscore").innerHTML =
-        (total / data.length).toFixed(2);
+        data.length ? (total / data.length).toFixed(2) : "0";
 
     document.getElementById("highest").innerHTML =
         max.toFixed(2);
 
     document.getElementById("lowest").innerHTML =
-        min.toFixed(2);
+        min === Number.MAX_VALUE ? "0" : min.toFixed(2);
 
     // Investment Score Chart
     new Chart(document.getElementById("scoreChart"), {
@@ -66,11 +75,17 @@ fetch(API + "/company-scores")
         type: "bar",
 
         data: {
+
             labels: labels,
+
             datasets: [{
+
                 label: "Investment Score",
+
                 data: values
+
             }]
+
         }
 
     });
@@ -85,7 +100,9 @@ fetch(API + "/company-scores")
             labels: Object.keys(sectorData),
 
             datasets: [{
+
                 data: Object.values(sectorData)
+
             }]
 
         }
@@ -102,7 +119,9 @@ fetch(API + "/company-scores")
             labels: Object.keys(recData),
 
             datasets: [{
+
                 data: Object.values(recData)
+
             }]
 
         }
@@ -120,12 +139,19 @@ fetch(API + "/company-scores")
 
             row.style.display =
                 row.innerText.toLowerCase().includes(value)
-                ? ""
-                : "none";
+                    ? ""
+                    : "none";
 
         });
 
     });
+
+})
+.catch(error => {
+
+    console.error(error);
+
+    showAlert("Unable to load dashboard data.", "danger");
 
 });
 

@@ -1,14 +1,16 @@
-
-
 checkAuth();
 
 const token = getToken();
 
 const params = new URLSearchParams(window.location.search);
 const companyId = params.get("id");
+
 const portfolioBtn = document.getElementById("portfolioBtn");
 
-portfolioBtn.addEventListener("click", addToPortfolio);
+if (portfolioBtn) {
+    portfolioBtn.addEventListener("click", addToPortfolio);
+}
+
 const recommendationBtn = document.getElementById("recommendationBtn");
 
 if (recommendationBtn) {
@@ -16,6 +18,7 @@ if (recommendationBtn) {
 }
 
 if (!companyId) {
+
     showAlert("Company ID not found.", "warning");
 
     setTimeout(() => {
@@ -25,9 +28,19 @@ if (!companyId) {
     throw new Error("Missing company id");
 }
 
-// Set button links
-document.getElementById("compareLink").href = `compare.html?id=${companyId}`;
-document.getElementById("ratioLink").href = `ratios.html?id=${companyId}`;
+// ----------------------
+// Navigation Links
+// ----------------------
+
+document.getElementById("compareLink").href =
+    `compare.html?id=${companyId}`;
+
+document.getElementById("ratioLink").href =
+    `ratios.html?id=${companyId}`;
+
+// ----------------------
+// Load Company
+// ----------------------
 
 async function loadCompany() {
 
@@ -35,9 +48,12 @@ async function loadCompany() {
 
     try {
 
-      const response = await fetch(`${API}/companies/${companyId}`, {
-    headers: getAuthHeaders()
-});
+        const response = await fetch(
+            `${window.API}/companies/${companyId}`,
+            {
+                headers: getAuthHeaders()
+            }
+        );
 
         if (!response.ok) {
 
@@ -63,10 +79,10 @@ async function loadCompany() {
             company.investment_score;
 
         document.getElementById("recommendation").textContent =
-    company.recommendation;
+            company.recommendation;
 
-document.getElementById("rank").textContent =
-    company.rank;
+        document.getElementById("rank").textContent =
+            company.rank;
 
         // Summary Table
         document.getElementById("companyNameTable").textContent =
@@ -79,10 +95,10 @@ document.getElementById("rank").textContent =
             company.investment_score;
 
         document.getElementById("recommendationTable").textContent =
-    company.recommendation;
+            company.recommendation;
 
-document.getElementById("rankTable").textContent =
-    company.rank;
+        document.getElementById("rankTable").textContent =
+            company.rank;
 
     } catch (error) {
 
@@ -98,34 +114,44 @@ document.getElementById("rankTable").textContent =
 
 }
 
-
 loadCompany();
+
+// ----------------------
+// Add to Portfolio
+// ----------------------
+
 async function addToPortfolio(event) {
 
     event.preventDefault();
 
-    const token = localStorage.getItem("token");
+    try {
 
-    const response = await fetch(
-
-        `${API}/portfolio/${companyId}`,
-
-        {
-
-            method: "POST",
-
-            headers: {
-
-                "Authorization": `Bearer ${token}`
-
+        const response = await fetch(
+            `${window.API}/portfolio/${companyId}`,
+            {
+                method: "POST",
+                headers: getAuthHeaders()
             }
+        );
+
+        const result = await response.json();
+
+        if (response.ok) {
+
+            showAlert(result.message || "Added to portfolio.", "success");
+
+        } else {
+
+            showAlert(result.detail || "Unable to add company.", "danger");
 
         }
 
-    );
+    } catch (error) {
 
-    const result = await response.json();
+        console.error(error);
 
-    alert(result.message);
+        showAlert("Server connection failed.", "danger");
+
+    }
 
 }

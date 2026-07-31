@@ -1,30 +1,37 @@
+// ------------------------------
+// Redirect if already logged in
+// ------------------------------
 
-
-// If already logged in, go directly to dashboard
 document.addEventListener("DOMContentLoaded", () => {
-    const token = localStorage.getItem("token");
+
+    const token = getToken();
 
     if (token && window.location.pathname.includes("login.html")) {
         window.location.href = "dashboard.html";
     }
+
 });
 
-// ---------------- LOGIN ----------------
+// ------------------------------
+// Login
+// ------------------------------
 
 async function login() {
 
     const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-if (!emailPattern.test(email)) {
-    showAlert("Please enter a valid email address.", "warning");
-    return;
-}
-    const password = document.getElementById("password").value.trim();
+    if (!emailPattern.test(email)) {
+        showAlert("Please enter a valid email address.", "warning");
+        return;
+    }
+
     if (password.length < 6) {
-    showAlert("Password must be at least 6 characters.", "warning");
-    return;
-}
+        showAlert("Password must be at least 6 characters.", "warning");
+        return;
+    }
 
     if (!email || !password) {
         showAlert("Please enter Email and Password.", "warning");
@@ -33,22 +40,27 @@ if (!emailPattern.test(email)) {
 
     showLoader();
 
-const loginButton = document.querySelector("button[onclick='login()']");
-if (loginButton) {
-    loginButton.disabled = true;
-}
+    const loginButton = document.querySelector("button[onclick='login()']");
+
+    if (loginButton) {
+        loginButton.disabled = true;
+    }
 
     try {
 
-        const response = await fetch(`${API}/auth/login`, {
+        const response = await fetch(`${window.API}/auth/login`, {
+
             method: "POST",
+
             headers: {
                 "Content-Type": "application/json"
             },
+
             body: JSON.stringify({
                 email,
                 password
             })
+
         });
 
         const data = await response.json();
@@ -57,7 +69,9 @@ if (loginButton) {
 
             localStorage.setItem("token", data.access_token);
 
-            localStorage.setItem("user", JSON.stringify(data.user));
+            if (data.user) {
+                localStorage.setItem("user", JSON.stringify(data.user));
+            }
 
             showAlert("Login Successful!", "success");
 
@@ -80,57 +94,73 @@ if (loginButton) {
     } finally {
 
         hideLoader();
+
         if (loginButton) {
-    loginButton.disabled = false;
-}
+            loginButton.disabled = false;
+        }
 
     }
+
 }
 
-// ---------------- SIGNUP ----------------
+// ------------------------------
+// Signup
+// ------------------------------
 
 async function signup() {
 
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-if (!emailPattern.test(email)) {
-    showAlert("Please enter a valid email address.", "warning");
-    return;
-}
-    const password = document.getElementById("password").value.trim();
+    if (!emailPattern.test(email)) {
+        showAlert("Please enter a valid email address.", "warning");
+        return;
+    }
 
     if (!name || !email || !password) {
         showAlert("Please fill all fields.", "warning");
         return;
     }
+
+    if (password.length < 6) {
+        showAlert("Password must be at least 6 characters.", "warning");
+        return;
+    }
+
     const terms = document.getElementById("terms");
 
-if (terms && !terms.checked) {
-    showAlert("Please accept the Terms & Conditions.", "warning");
-    return;
-}
+    if (terms && !terms.checked) {
+        showAlert("Please accept the Terms & Conditions.", "warning");
+        return;
+    }
 
-  showLoader();
+    showLoader();
 
-const signupButton = document.querySelector("button[onclick='signup()']");
-if (signupButton) {
-    signupButton.disabled = true;
-}
+    const signupButton = document.querySelector("button[onclick='signup()']");
+
+    if (signupButton) {
+        signupButton.disabled = true;
+    }
 
     try {
 
-        const response = await fetch(`${API}/auth/signup`, {
+        const response = await fetch(`${window.API}/auth/signup`, {
+
             method: "POST",
+
             headers: {
                 "Content-Type": "application/json"
             },
+
             body: JSON.stringify({
                 name,
                 email,
                 password
             })
+
         });
 
         const data = await response.json();
@@ -158,14 +188,18 @@ if (signupButton) {
     } finally {
 
         hideLoader();
+
         if (signupButton) {
-    signupButton.disabled = false;
-}
+            signupButton.disabled = false;
+        }
 
     }
+
 }
 
-// ---------------- LOGOUT ----------------
+// ------------------------------
+// Logout
+// ------------------------------
 
 function logout() {
 
@@ -173,9 +207,12 @@ function logout() {
     localStorage.removeItem("user");
 
     window.location.href = "login.html";
+
 }
 
-// ---------------- SHOW / HIDE PASSWORD ----------------
+// ------------------------------
+// Show / Hide Password
+// ------------------------------
 
 function togglePassword() {
 
@@ -195,25 +232,5 @@ function togglePassword() {
         eye.className = "bi bi-eye";
 
     }
-}
-// ===============================
-// Authentication Helper Functions
-// ===============================
 
-function getToken() {
-    return localStorage.getItem("token");
-}
-
-function checkAuth() {
-    const token = getToken();
-
-    if (!token) {
-        window.location.href = "login.html";
-    }
-}
-
-function getAuthHeaders() {
-    return {
-        "Authorization": `Bearer ${getToken()}`
-    };
 }

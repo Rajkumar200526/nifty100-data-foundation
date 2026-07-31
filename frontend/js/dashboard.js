@@ -1,30 +1,24 @@
+checkAuth();
 
+const token = getToken();
 
-    const token = localStorage.getItem("token");
+// Store company data
+let companyData = [];
 
-    if (!token) {
-        window.location.href = "login.html";
-    }
+// ---------------------
+// Load Dashboard Cards
+// ---------------------
+async function loadDashboard() {
 
-    // Store company data
-    let companyData = [];
+    try {
 
-    // ---------------------
-    // Load Dashboard Cards
-    // ---------------------
-    async function loadDashboard() {
-
-        const response = await fetch(`${API}/dashboard`, {
-
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-
+        const response = await fetch(`${window.API}/dashboard`, {
+            headers: getAuthHeaders()
         });
 
         if (!response.ok) {
 
-            alert("Session Expired");
+            showAlert("Session Expired", "danger");
 
             localStorage.clear();
 
@@ -36,33 +30,39 @@
 
         const data = await response.json();
 
-        document.getElementById("totalCompanies").innerHTML =
-            data.total_companies;
+        document.getElementById("totalCompanies").textContent =
+            data.total_companies ?? 0;
 
-        document.getElementById("totalClusters").innerHTML =
-            data.total_clusters;
+        document.getElementById("totalClusters").textContent =
+            data.total_clusters ?? 0;
 
-        document.getElementById("averageROE").innerHTML =
-            data.average_roe;
+        document.getElementById("averageROE").textContent =
+            data.average_roe ?? 0;
+
+    } catch (error) {
+
+        console.error(error);
+
+        showAlert("Unable to load dashboard.", "danger");
 
     }
 
-    // ---------------------
-    // Load Companies
-    // ---------------------
-    async function loadCompanies() {
+}
 
-        const response = await fetch(`${API}/company-scores`, {
+// ---------------------
+// Load Companies
+// ---------------------
+async function loadCompanies() {
 
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
+    try {
 
+        const response = await fetch(`${window.API}/company-scores`, {
+            headers: getAuthHeaders()
         });
 
         if (!response.ok) {
 
-            alert("Session Expired");
+            showAlert("Session Expired", "danger");
 
             localStorage.clear();
 
@@ -75,264 +75,268 @@
         companyData = await response.json();
 
         displayCompanies(companyData);
+
         drawScoreChart(companyData);
+
         drawSectorChart(companyData);
 
-    }
+    } catch (error) {
 
-    // ---------------------
-    // Display Table
-    // ---------------------
-    function displayCompanies(data) {
-        console.log(data);
+        console.error(error);
 
-        let html = "";
-
-        data.forEach((company) => {
-
-            html += `
-
-            <tr>
-
-                <td>${company.Rank}</td>
-
-                <td>
-        <a href="company.html?id=${company.company_id}"
-        class="text-decoration-none fw-bold">
-            ${company.company_name}
-        </a>
-    </td>
-
-                <td>${company.broad_sector}</td>
-
-                <td>${Number(company.investment_score).toFixed(2)}</td>
-
-            </tr>
-
-            `;
-
-        });
-
-        document.getElementById("companyTable").innerHTML = html;
+        showAlert("Unable to load companies.", "danger");
 
     }
 
-    // ---------------------
-    // Search Company
-    // ---------------------
-    document.getElementById("searchBox").addEventListener("keyup", function () {
+}
 
-        const search = this.value.toLowerCase();
+// ---------------------
+// Display Table
+// ---------------------
+function displayCompanies(data) {
 
-        const filtered = companyData.filter(company =>
+    let html = "";
 
-            company.company_name.toLowerCase().includes(search)
+    data.forEach(company => {
 
-        );
+        html += `
+        <tr>
 
-        displayCompanies(filtered);
-        
+            <td>${company.rank ?? "-"}</td>
+
+            <td>
+                <a href="company.html?id=${company.company_id}"
+                class="text-decoration-none fw-bold">
+                    ${company.company_name}
+                </a>
+            </td>
+
+            <td>${company.broad_sector}</td>
+
+            <td>${Number(company.investment_score ?? 0).toFixed(2)}</td>
+
+        </tr>
+        `;
 
     });
 
-    // ---------------------
-    // Logout
-    // ---------------------
-    function logout() {
+    document.getElementById("companyTable").innerHTML = html;
 
-        localStorage.clear();
+}
 
-        window.location.href = "login.html";
+// ---------------------
+// Search
+// ---------------------
+document.getElementById("searchBox").addEventListener("keyup", function () {
 
-    }
-    // --------------------
-    // Bar Chart
-    // --------------------
-    function drawScoreChart(data) {
+    const search = this.value.toLowerCase();
 
-        const labels = data.map(c => c.company_name);
+    const filtered = companyData.filter(company =>
+        company.company_name.toLowerCase().includes(search)
+    );
 
-        const scores = data.map(c => c.investment_score);
+    displayCompanies(filtered);
 
-        new Chart(document.getElementById("scoreChart"), {
+});
 
-            type: "bar",
+// ---------------------
+// Logout
+// ---------------------
+function logout() {
 
-            data: {
+    localStorage.clear();
 
-                labels: labels,
+    window.location.href = "login.html";
 
-                datasets: [{
+}
 
-                    label: "Investment Score",
+// ---------------------
+// Score Chart
+// ---------------------
+function drawScoreChart(data) {
 
-                    data: scores
+    const labels = data.map(c => c.company_name);
 
-                }]
+    const scores = data.map(c => c.investment_score);
 
-            },
+    new Chart(document.getElementById("scoreChart"), {
 
-            options: {
+        type: "bar",
 
-                responsive: true,
+        data: {
 
-                plugins: {
+            labels,
 
-                    legend: {
+            datasets: [{
 
-                        display: false
+                label: "Investment Score",
 
-                    }
+                data: scores
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            plugins: {
+
+                legend: {
+
+                    display: false
 
                 }
 
             }
 
-        });
-
-    }
-
-    // --------------------
-    // Pie Chart
-    // --------------------
-    function drawSectorChart(data) {
-
-        const sectors = {};
-
-        data.forEach(company => {
-
-            sectors[company.broad_sector] =
-                (sectors[company.broad_sector] || 0) + 1;
-
-        });
-
-        new Chart(document.getElementById("sectorChart"), {
-
-            type: "pie",
-
-            data: {
-
-                labels: Object.keys(sectors),
-
-                datasets: [{
-
-                    data: Object.values(sectors)
-
-                }]
-
-            }
-
-        });
-
-    }
-    async function loadPortfolioSummary() {
-
-    // -----------------------------
-    // Portfolio List
-    // -----------------------------
-    const listResponse = await fetch(
-        `${API}/portfolio/list`,
-        {
-            headers: getAuthHeaders()
         }
-    );
 
-    if (!listResponse.ok) {
-        console.error("Unable to load portfolio");
-        return;
-    }
+    });
 
-    const portfolio = await listResponse.json();
+}
 
-    document.getElementById("portfolioCompanies").textContent =
-        portfolio.length;
+// ---------------------
+// Sector Chart
+// ---------------------
+function drawSectorChart(data) {
 
-    let totalScore = 0;
     const sectors = {};
 
-    portfolio.forEach(company => {
-
-        totalScore += Number(company.investment_score);
+    data.forEach(company => {
 
         sectors[company.broad_sector] =
             (sectors[company.broad_sector] || 0) + 1;
 
     });
 
-    const average =
-        portfolio.length
-            ? (totalScore / portfolio.length).toFixed(2)
-            : 0;
+    new Chart(document.getElementById("sectorChart"), {
 
-    document.getElementById("portfolioAverage").textContent =
-        average;
+        type: "pie",
 
-    let topSector = "-";
-    let max = 0;
+        data: {
 
-    for (const sector in sectors) {
+            labels: Object.keys(sectors),
 
-        if (sectors[sector] > max) {
+            datasets: [{
 
-            max = sectors[sector];
-            topSector = sector;
+                data: Object.values(sectors)
+
+            }]
 
         }
 
-    }
+    });
 
-    document.getElementById("portfolioSector").textContent =
-        topSector;
+}
 
-    // -----------------------------
-    // Portfolio Health
-    // -----------------------------
-    const healthResponse = await fetch(
-        `${API}/portfolio/health`,
-        {
-            headers: getAuthHeaders()
+// ---------------------
+// Portfolio Summary
+// ---------------------
+async function loadPortfolioSummary() {
+
+    try {
+
+        const listResponse = await fetch(
+            `${window.API}/portfolio/list`,
+            {
+                headers: getAuthHeaders()
+            }
+        );
+
+        if (!listResponse.ok) return;
+
+        const portfolio = await listResponse.json();
+
+        document.getElementById("portfolioCompanies").textContent =
+            portfolio.length;
+
+        let totalScore = 0;
+
+        const sectors = {};
+
+        portfolio.forEach(company => {
+
+            totalScore += Number(company.investment_score ?? 0);
+
+            sectors[company.broad_sector] =
+                (sectors[company.broad_sector] || 0) + 1;
+
+        });
+
+        document.getElementById("portfolioAverage").textContent =
+            portfolio.length
+                ? (totalScore / portfolio.length).toFixed(2)
+                : "0";
+
+        let topSector = "-";
+        let max = 0;
+
+        for (const sector in sectors) {
+
+            if (sectors[sector] > max) {
+
+                max = sectors[sector];
+                topSector = sector;
+
+            }
+
         }
-    );
 
-    if (healthResponse.ok) {
+        document.getElementById("portfolioSector").textContent =
+            topSector;
 
-        const health = await healthResponse.json();
+        const healthResponse = await fetch(
+            `${window.API}/portfolio/health`,
+            {
+                headers: getAuthHeaders()
+            }
+        );
 
-        document.getElementById("portfolioHealth").textContent =
-            health.status;
+        if (healthResponse.ok) {
 
-    }
+            const health = await healthResponse.json();
 
-    // -----------------------------
-    // AI Insights
-    // -----------------------------
-    const insightResponse = await fetch(
-        `${API}/portfolio/insights`,
-        {
-            headers: getAuthHeaders()
+            document.getElementById("portfolioHealth").textContent =
+                health.status;
+
         }
-    );
 
-    if (insightResponse.ok) {
+        const insightResponse = await fetch(
+            `${window.API}/portfolio/insights`,
+            {
+                headers: getAuthHeaders()
+            }
+        );
 
-        const insight = await insightResponse.json();
+        if (insightResponse.ok) {
 
-        document.getElementById("bestCompany").textContent =
-            insight.best_company;
+            const insight = await insightResponse.json();
 
-        document.getElementById("worstCompany").textContent =
-            insight.worst_company;
+            document.getElementById("bestCompany").textContent =
+                insight.best_company;
 
-        document.getElementById("dashboardSuggestion").textContent =
-            insight.suggestion;
+            document.getElementById("worstCompany").textContent =
+                insight.worst_company;
+
+            document.getElementById("dashboardSuggestion").textContent =
+                insight.suggestion;
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
 
     }
 
 }
 
-    // ---------------------
-    // Load Everything
-    // ---------------------
-    loadDashboard();
+// ---------------------
+// Initialize
+// ---------------------
+
+loadDashboard();
 loadCompanies();
 loadPortfolioSummary();

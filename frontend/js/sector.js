@@ -1,20 +1,8 @@
-const API = "https://nifty-financial-analytics-platform-ikzb.onrender.com";
-function showLoader() {
-    console.log("Loading...");
-}
-
-function hideLoader() {
-    console.log("Done.");
-}
-
-function showAlert(message, type = "info") {
-    alert(message);
-}
 checkAuth();
-const token = getToken();
 
 let chart = null;
 let sectorData = [];
+
 Chart.register(ChartDataLabels);
 
 async function loadSectorAnalytics() {
@@ -23,50 +11,63 @@ async function loadSectorAnalytics() {
 
     try {
 
-        const response = await fetch(`${API}/sector-analysis`, {
-    headers: getAuthHeaders()
-});
+        const response = await fetch(
+            `${window.API}/sector-analysis`,
+            {
+                headers: getAuthHeaders()
+            }
+        );
 
         if (!response.ok) {
             throw new Error("Failed to fetch sector analytics");
         }
 
         const data = await response.json();
+
         sectorData = data;
-       
-    // Populate sector filter
-const sectorFilter = document.getElementById("sectorFilter");
 
-if (sectorFilter) {
+        // --------------------------
+        // Populate Sector Filter
+        // --------------------------
 
-    sectorFilter.innerHTML = '<option value="All">All Sectors</option>';
+        const sectorFilter = document.getElementById("sectorFilter");
 
-    data.forEach(item => {
-        sectorFilter.innerHTML += `
-            <option value="${item.sector}">
-                ${item.sector}
-            </option>
-        `;
-    });
+        if (sectorFilter) {
 
-}
+            sectorFilter.innerHTML =
+                '<option value="All">All Sectors</option>';
 
+            data.forEach(item => {
 
+                sectorFilter.innerHTML += `
+                    <option value="${item.sector}">
+                        ${item.sector}
+                    </option>
+                `;
+
+            });
+
+        }
 
         updateDashboard(data);
 
-  } catch (err) {
+    } catch (error) {
 
-    console.error(err);
-    showAlert("Unable to load sector analytics.", "danger");
+        console.error(error);
 
-} finally {
+        showAlert("Unable to load sector analytics.", "danger");
 
-    hideLoader();
+    } finally {
+
+        hideLoader();
+
+    }
 
 }
 
-}
+// ====================================
+// Draw Doughnut Chart
+// ====================================
 
 function drawChart(labels, values) {
 
@@ -77,160 +78,142 @@ function drawChart(labels, values) {
     }
 
     chart = new Chart(ctx, {
+
         type: "doughnut",
+
         data: {
-            labels: labels,
-           datasets: [{
-    label: "Companies",
-    data: values,
 
-    backgroundColor: [
-        "#0d6efd",   // Blue
-        "#198754",   // Green
-        "#ffc107",   // Yellow
-        "#dc3545",   // Red
-        "#6f42c1",   // Purple
-        "#20c997"    // Teal
-    ],
+            labels,
 
-    borderColor: "#ffffff",
-    borderWidth: 2,
-    hoverOffset: 12
-}]
+            datasets: [
+
+                {
+
+                    label: "Companies",
+
+                    data: values,
+
+                    backgroundColor: [
+
+                        "#0d6efd",
+                        "#198754",
+                        "#ffc107",
+                        "#dc3545",
+                        "#6f42c1",
+                        "#20c997"
+
+                    ],
+
+                    borderColor: "#ffffff",
+
+                    borderWidth: 2,
+
+                    hoverOffset: 12
+
+                }
+
+            ]
+
         },
+
         options: {
 
-    responsive: true,
+            responsive: true,
 
-    maintainAspectRatio: false,
+            maintainAspectRatio: false,
 
-    animation: {
+            animation: {
 
-        animateRotate: true,
+                animateRotate: true,
 
-        animateScale: true
+                animateScale: true
 
-    },
+            },
 
-    plugins: {
+            plugins: {
 
-        title: {
+                title: {
 
-            display: true,
+                    display: true,
 
-            text: "Sector Distribution of N100 Companies",
+                    text: "Sector Distribution",
 
-            color: "#212529",
+                    font: {
 
-            font: {
+                        size: 20,
 
-                size: 20,
+                        weight: "bold"
 
-                weight: "bold"
+                    }
 
-            }
+                },
 
-        },
+                legend: {
 
-        legend: {
+                    position: "bottom"
 
-            position: "bottom",
+                },
 
-            labels: {
+                datalabels: {
 
-                padding: 20,
+                    color: "#fff",
 
-                boxWidth: 20,
+                    font: {
 
-                font: {
+                        weight: "bold",
 
-                    size: 14
+                        size: 14
+
+                    },
+
+                    formatter: (value, context) => {
+
+                        const values =
+                            context.chart.data.datasets[0].data;
+
+                        const total =
+                            values.reduce((a, b) => a + b, 0);
+
+                        return ((value / total) * 100).toFixed(1) + "%";
+
+                    }
 
                 }
 
             }
-            
 
-        },
-        datalabels: {
+        }
 
-    color: "#fff",
-
-    font: {
-
-        weight: "bold",
-        size: 14
-
-    },
-
-    formatter: (value, context) => {
-
-        const data = context.chart.data.datasets[0].data;
-
-        const total = data.reduce((a, b) => a + b, 0);
-
-        const percentage = ((value / total) * 100).toFixed(1);
-
-        return percentage + "%";
-
-    }
-
-}
-
-    }
-
-}
     });
 
 }
 
-loadSectorAnalytics();
+// ====================================
+// Update Dashboard
+// ====================================
 
-const sectorFilterElement = document.getElementById("sectorFilter");
-
-if (sectorFilterElement) {
-    sectorFilterElement.addEventListener("change", filterSector);
-}
-
-const searchSectorElement = document.getElementById("searchSector");
-
-if (searchSectorElement) {
-    searchSectorElement.addEventListener("keyup", searchSector);
-}
-function filterSector() {
-
-    const selectedSector = document.getElementById("sectorFilter").value;
-
-    let filteredData;
-
-    if (selectedSector === "All") {
-
-        filteredData = sectorData;
-
-    } else {
-
-        filteredData = sectorData.filter(item => item.sector === selectedSector);
-
-    }
-
-    updateDashboard(filteredData);
-
-}
 function updateDashboard(data) {
-    // Update summary cards
-document.getElementById("totalSectors").textContent = data.length;
 
-const totalCompanies = data.reduce((sum, item) => sum + item.companies, 0);
-document.getElementById("totalCompanies").textContent = totalCompanies;
+    document.getElementById("totalSectors").textContent =
+        data.length;
 
-const highestROE = data.length > 0
-    ? Math.max(...data.map(item => item.avg_roe))
-    : 0;
+    const totalCompanies =
+        data.reduce((sum, item) => sum + item.companies, 0);
 
-document.getElementById("highestROE").textContent =
-    highestROE.toFixed(2) + "%";
+    document.getElementById("totalCompanies").textContent =
+        totalCompanies;
 
-    const table = document.getElementById("sectorTable");
+    const highestROE =
+        data.length
+            ? Math.max(...data.map(item => item.avg_roe))
+            : 0;
+
+    document.getElementById("highestROE").textContent =
+        highestROE.toFixed(2) + "%";
+
+    const table =
+        document.getElementById("sectorTable");
+
     table.innerHTML = "";
 
     const labels = [];
@@ -239,18 +222,37 @@ document.getElementById("highestROE").textContent =
     data.forEach(item => {
 
         table.innerHTML += `
+
             <tr class="text-center">
+
                 <td>${item.sector}</td>
+
                 <td>${item.companies}</td>
-                <td class="text-end">₹${Number(item.avg_sales).toLocaleString()}</td>
-                <td class="text-end">₹${Number(item.avg_profit).toLocaleString()}</td>
-                <td class="${item.avg_roe >= 30 ? 'text-success fw-bold' : 'fw-bold'}">
-                    ${Number(item.avg_roe).toFixed(2)}%
+
+                <td class="text-end">
+                    ₹${Number(item.avg_sales).toLocaleString()}
                 </td>
+
+                <td class="text-end">
+                    ₹${Number(item.avg_profit).toLocaleString()}
+                </td>
+
+                <td class="${
+                    item.avg_roe >= 30
+                        ? "text-success fw-bold"
+                        : "fw-bold"
+                }">
+
+                    ${Number(item.avg_roe).toFixed(2)}%
+
+                </td>
+
             </tr>
+
         `;
 
         labels.push(item.sector);
+
         values.push(item.companies);
 
     });
@@ -258,17 +260,82 @@ document.getElementById("highestROE").textContent =
     drawChart(labels, values);
 
 }
-function searchSector() {
 
-    const searchText = document
-        .getElementById("searchSector")
-        .value
-        .toLowerCase();
+// ====================================
+// Filter
+// ====================================
 
-    const filteredData = sectorData.filter(item =>
-        item.sector.toLowerCase().includes(searchText)
-    );
+function filterSector() {
 
-    updateDashboard(filteredData);
+    const selected =
+        document.getElementById("sectorFilter").value;
+
+    if (selected === "All") {
+
+        updateDashboard(sectorData);
+
+        return;
+
+    }
+
+    const filtered =
+        sectorData.filter(item => item.sector === selected);
+
+    updateDashboard(filtered);
 
 }
+
+// ====================================
+// Search
+// ====================================
+
+function searchSector() {
+
+    const search =
+        document
+            .getElementById("searchSector")
+            .value
+            .toLowerCase();
+
+    const filtered =
+        sectorData.filter(item =>
+            item.sector.toLowerCase().includes(search)
+        );
+
+    updateDashboard(filtered);
+
+}
+
+// ====================================
+// Events
+// ====================================
+
+const sectorFilter =
+    document.getElementById("sectorFilter");
+
+if (sectorFilter) {
+
+    sectorFilter.addEventListener(
+        "change",
+        filterSector
+    );
+
+}
+
+const searchBox =
+    document.getElementById("searchSector");
+
+if (searchBox) {
+
+    searchBox.addEventListener(
+        "keyup",
+        searchSector
+    );
+
+}
+
+// ====================================
+// Initialize
+// ====================================
+
+loadSectorAnalytics();

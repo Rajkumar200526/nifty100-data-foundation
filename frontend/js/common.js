@@ -1,7 +1,10 @@
+// ----------------------
+// Global API URL
+// ----------------------
 
-const API = "https://nifty-financial-analytics-platform-ikzb.onrender.com";
-window.API = API;
-// --;--------------------
+window.API = "https://nifty-financial-analytics-platform-ikzb.onrender.com";
+
+// ----------------------
 // Authentication
 // ----------------------
 
@@ -11,7 +14,7 @@ function getToken() {
 
 function getAuthHeaders() {
     return {
-        "Authorization": `Bearer ${getToken()}`
+        Authorization: `Bearer ${getToken()}`
     };
 }
 
@@ -24,11 +27,8 @@ function checkAuth() {
 }
 
 function logout() {
-
     localStorage.removeItem("token");
-
     window.location.href = "login.html";
-
 }
 
 // ----------------------
@@ -36,23 +36,19 @@ function logout() {
 // ----------------------
 
 function showLoader() {
-
     const loader = document.getElementById("loader");
 
     if (loader) {
         loader.style.display = "flex";
     }
-
 }
 
 function hideLoader() {
-
     const loader = document.getElementById("loader");
 
     if (loader) {
         loader.style.display = "none";
     }
-
 }
 
 // ----------------------
@@ -60,7 +56,6 @@ function hideLoader() {
 // ----------------------
 
 function showAlert(message, type = "success") {
-
     const alertBox = document.getElementById("alertBox");
 
     if (!alertBox) return;
@@ -73,23 +68,16 @@ function showAlert(message, type = "success") {
     `;
 
     setTimeout(() => {
-
         const alert = alertBox.querySelector(".alert");
 
         if (alert) {
-
             alert.classList.remove("show");
 
             setTimeout(() => {
-
                 alert.remove();
-
             }, 300);
-
         }
-
     }, 3000);
-
 }
 
 // ----------------------
@@ -97,15 +85,11 @@ function showAlert(message, type = "success") {
 // ----------------------
 
 function formatNumber(value) {
-
     if (value === null || value === undefined) {
-
         return "N/A";
-
     }
 
     return Number(value).toLocaleString("en-US");
-
 }
 
 // ----------------------
@@ -113,13 +97,9 @@ function formatNumber(value) {
 // ----------------------
 
 function formatPercent(value) {
-
     if (value === null || value === undefined) {
-
         return "N/A";
-
     }
 
     return Number(value).toFixed(2) + "%";
-
 }

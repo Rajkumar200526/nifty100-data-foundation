@@ -1,9 +1,8 @@
-
-
 checkAuth();
 
 const params = new URLSearchParams(window.location.search);
 const companyId = params.get("id");
+
 if (!companyId) {
 
     showAlert("Company ID not found.", "warning");
@@ -13,6 +12,7 @@ if (!companyId) {
     }, 1500);
 
     throw new Error("Missing company id");
+
 }
 
 let ratioChart = null;
@@ -23,49 +23,53 @@ async function loadRatios() {
 
     try {
 
-  const response = await fetch(
-    `${API}/company/${companyId}/ratios`,
-    {
-        headers: getAuthHeaders()
-    }
-);
+        const response = await fetch(
+            `${window.API}/company/${companyId}/ratios`,
+            {
+                headers: getAuthHeaders()
+            }
+        );
 
         if (!response.ok) {
-            showAlert("Unable to load ratios.", "danger");
+
+            showAlert("Unable to load financial ratios.", "danger");
             return;
+
         }
 
         const data = await response.json();
-        console.log(data);
 
         if (!Array.isArray(data) || data.length === 0) {
+
             showAlert("No financial ratio data found.", "warning");
             return;
+
         }
 
         const latest = data[data.length - 1];
-        document.getElementById("roe").innerText =
-    latest.roe != null
-        ? latest.roe.toFixed(2) + "%"
-        : "N/A";
 
-      document.getElementById("companyName").innerText =
-    `Financial Trends - ${latest.company_name}`;
+        document.getElementById("companyName").innerText =
+            `Financial Trends - ${latest.company_name}`;
+
+        document.getElementById("roe").innerText =
+            latest.roe != null
+                ? latest.roe.toFixed(2) + "%"
+                : "N/A";
 
         document.getElementById("roa").innerText =
-    latest.roa != null
-        ? latest.roa.toFixed(2) + "%"
-        : "N/A";
+            latest.roa != null
+                ? latest.roa.toFixed(2) + "%"
+                : "N/A";
 
-document.getElementById("debt").innerText =
-    latest.debt_to_equity != null
-        ? latest.debt_to_equity.toFixed(2)
-        : "N/A";
+        document.getElementById("debt").innerText =
+            latest.debt_to_equity != null
+                ? latest.debt_to_equity.toFixed(2)
+                : "N/A";
 
-document.getElementById("currentRatio").innerText =
-    latest.current_ratio != null
-        ? latest.current_ratio.toFixed(2)
-        : "N/A";
+        document.getElementById("currentRatio").innerText =
+            latest.current_ratio != null
+                ? latest.current_ratio.toFixed(2)
+                : "N/A";
 
         document.getElementById("roce").innerText =
             latest.roce != null
@@ -95,30 +99,30 @@ document.getElementById("currentRatio").innerText =
 
                     labels: years,
 
-   datasets: [
+                    datasets: [
 
-    {
-        label: "ROE %",
-        data: data.map(item => item.roe ?? 0),
-        borderWidth: 2,
-        fill: false
-    },
+                        {
+                            label: "ROE %",
+                            data: data.map(item => item.roe ?? 0),
+                            borderWidth: 2,
+                            fill: false
+                        },
 
-    {
-        label: "ROCE %",
-        data: data.map(item => item.roce ?? 0),
-        borderWidth: 2,
-        fill: false
-    },
+                        {
+                            label: "ROCE %",
+                            data: data.map(item => item.roce ?? 0),
+                            borderWidth: 2,
+                            fill: false
+                        },
 
-    {
-        label: "Free Cash Flow",
-        data: data.map(item => item.free_cash_flow ?? 0),
-        borderWidth: 2,
-        fill: false
-    }
+                        {
+                            label: "Free Cash Flow",
+                            data: data.map(item => item.free_cash_flow ?? 0),
+                            borderWidth: 2,
+                            fill: false
+                        }
 
-]
+                    ]
 
                 },
 
@@ -139,9 +143,7 @@ document.getElementById("currentRatio").innerText =
                     scales: {
 
                         y: {
-
                             beginAtZero: true
-
                         }
 
                     }
@@ -152,17 +154,13 @@ document.getElementById("currentRatio").innerText =
 
         );
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error(error);
 
         showAlert("Error loading financial ratios.", "danger");
 
-    }
-
-    finally {
+    } finally {
 
         hideLoader();
 
