@@ -1,8 +1,17 @@
-# 📈 N100 Financial Intelligence Platform
+# 📈 N10 Financial Intelligence Platform
 
-An AI-powered financial analytics platform built using **FastAPI**, **SQLite**, **HTML**, **Bootstrap**, and **JavaScript** for analyzing Nifty 100 companies. The platform provides company analysis, financial ratios, sector analytics, portfolio management, AI-driven insights, and company comparison dashboards.
+An AI-powered financial analytics platform built using **FastAPI**, **SQLite**, **HTML**, **Bootstrap**, and **JavaScript** for analyzing Nifty 10 companies. The platform provides company analysis, financial ratios, sector analytics, portfolio management, AI-driven insights, and company comparison dashboards.
 
----
+## About the Project
+
+This project was developed during my **Data Analyst Internship at Bluestock Fintech**.where I designed and developed a financial intelligence platform featuring analytics dashboards, investment scoring, portfolio management, and sector-wise financial analysis.
+
+
+--- ## 🌐 Live Demo
+
+**Project URL:**  
+https://nifty-financial-platform-dashboard.onrender.com
+
 
 ## 🚀 Features
 
@@ -140,10 +149,7 @@ nifty100-data-foundation/
 ## Clone Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/nifty100-data-foundation.git
-```
-
----
+git clone https://github.com/Rajkumar200526/nifty100-data-foundation.git
 
 ## Navigate to Project
 
@@ -226,10 +232,6 @@ http://127.0.0.1:5500/frontend/login.html
 ---
 
 # 📷 Screenshots
-
-Add screenshots here:
-
-# 📷 Screenshots
 ---
 ## Create Account
 
@@ -309,7 +311,7 @@ Add screenshots here:
 **AMPOLU RAJ KUMAR**
 
 B.Tech Computer Science Engineering (Artificial Intelligence & Machine Learning)
-SRGEC 
+Seshadri Rao Gudlavalleru Engineering College
 
 ---
 
