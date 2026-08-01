@@ -1,20 +1,27 @@
-// ------------------------------
+// ==============================
 // Redirect if already logged in
-// ------------------------------
+// ==============================
 
 document.addEventListener("DOMContentLoaded", () => {
 
     const token = getToken();
 
-    if (token && window.location.pathname.includes("login.html")) {
+    // If already logged in and on the login/home page,
+    // redirect to dashboard.
+    if (
+        token &&
+        (window.location.pathname.endsWith("index.html") ||
+         window.location.pathname.endsWith("login.html") ||
+         window.location.pathname === "/")
+    ) {
         window.location.href = "dashboard.html";
     }
 
 });
 
-// ------------------------------
+// ==============================
 // Login
-// ------------------------------
+// ==============================
 
 async function login() {
 
@@ -28,13 +35,13 @@ async function login() {
         return;
     }
 
-    if (password.length < 6) {
-        showAlert("Password must be at least 6 characters.", "warning");
+    if (!email || !password) {
+        showAlert("Please enter Email and Password.", "warning");
         return;
     }
 
-    if (!email || !password) {
-        showAlert("Please enter Email and Password.", "warning");
+    if (password.length < 6) {
+        showAlert("Password must be at least 6 characters.", "warning");
         return;
     }
 
@@ -103,9 +110,9 @@ async function login() {
 
 }
 
-// ------------------------------
+// ==============================
 // Signup
-// ------------------------------
+// ==============================
 
 async function signup() {
 
@@ -170,7 +177,7 @@ async function signup() {
             showAlert("Signup Successful!", "success");
 
             setTimeout(() => {
-                window.location.href = "login.html";
+                window.location.href = "index.html";
             }, 1000);
 
         } else {
@@ -197,22 +204,22 @@ async function signup() {
 
 }
 
-// ------------------------------
+// ==============================
 // Logout
-// ------------------------------
+// ==============================
 
 function logout() {
 
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    window.location.href = "login.html";
+    window.location.href = "index.html";
 
 }
 
-// ------------------------------
+// ==============================
 // Show / Hide Password
-// ------------------------------
+// ==============================
 
 function togglePassword() {
 

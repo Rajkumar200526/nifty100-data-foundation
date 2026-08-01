@@ -1,3 +1,8 @@
+// ======================================
+// N100 Financial Intelligence Platform
+// common.js
+// ======================================
+
 // ----------------------
 // Global API URL
 // ----------------------
@@ -14,21 +19,29 @@ function getToken() {
 
 function getAuthHeaders() {
     return {
-        Authorization: `Bearer ${getToken()}`
+        "Authorization": `Bearer ${getToken()}`
     };
 }
 
 function checkAuth() {
+
     const token = getToken();
 
     if (!token) {
-        window.location.href = "login.html";
+
+        window.location.href = "index.html";
+
     }
+
 }
 
 function logout() {
+
     localStorage.removeItem("token");
-    window.location.href = "login.html";
+    localStorage.removeItem("user");
+
+    window.location.href = "index.html";
+
 }
 
 // ----------------------
@@ -36,19 +49,27 @@ function logout() {
 // ----------------------
 
 function showLoader() {
+
     const loader = document.getElementById("loader");
 
     if (loader) {
+
         loader.style.display = "flex";
+
     }
+
 }
 
 function hideLoader() {
+
     const loader = document.getElementById("loader");
 
     if (loader) {
+
         loader.style.display = "none";
+
     }
+
 }
 
 // ----------------------
@@ -56,28 +77,44 @@ function hideLoader() {
 // ----------------------
 
 function showAlert(message, type = "success") {
+
     const alertBox = document.getElementById("alertBox");
 
-    if (!alertBox) return;
+    if (!alertBox) {
+
+        alert(message);
+        return;
+
+    }
 
     alertBox.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show">
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
             ${message}
-            <button class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
         </div>
     `;
 
     setTimeout(() => {
-        const alert = alertBox.querySelector(".alert");
 
-        if (alert) {
-            alert.classList.remove("show");
+        const alertElement = alertBox.querySelector(".alert");
+
+        if (alertElement) {
+
+            alertElement.classList.remove("show");
 
             setTimeout(() => {
-                alert.remove();
+
+                alertElement.remove();
+
             }, 300);
+
         }
+
     }, 3000);
+
 }
 
 // ----------------------
@@ -85,11 +122,15 @@ function showAlert(message, type = "success") {
 // ----------------------
 
 function formatNumber(value) {
-    if (value === null || value === undefined) {
+
+    if (value === null || value === undefined || isNaN(value)) {
+
         return "N/A";
+
     }
 
     return Number(value).toLocaleString("en-US");
+
 }
 
 // ----------------------
@@ -97,9 +138,13 @@ function formatNumber(value) {
 // ----------------------
 
 function formatPercent(value) {
-    if (value === null || value === undefined) {
+
+    if (value === null || value === undefined || isNaN(value)) {
+
         return "N/A";
+
     }
 
     return Number(value).toFixed(2) + "%";
+
 }

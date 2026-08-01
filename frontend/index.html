@@ -1,16 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Redirecting...</title>
 
-    <script>
-        window.location.replace("login.html");
-    </script>
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>N100 Financial Intelligence Platform - Login</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 </head>
 
-<body>
+<body class="bg-light">
+
+<div class="container-fluid vh-100 d-flex justify-content-center align-items-center">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-4 col-md-6">
+
+                <div id="alertBox"></div>
+
+                <div class="card shadow-lg border-0">
+
+                    <div class="card-header bg-primary text-white text-center">
+
+                        <h3 class="mb-1">
+
+                            <i class="bi bi-bar-chart-fill"></i>
+
+                            N100 Financial Intelligence Platform
+
+                        </h3>
+
+                        <small>Secure Login</small>
+
+                    </div>
+
+                    <div class="card-body p-4">
+
+                        <div class="mb-3">
+
+                            <label for="email" class="form-label">
+
+                                <i class="bi bi-envelope-fill"></i>
+
+                                Email
+
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                class="form-control"
+                                placeholder="Enter your email"
+                                autocomplete="email"
+                                required>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label for="password" class="form-label">
+
+                                <i class="bi bi-lock-fill"></i>
+
+                                Password
+
+                            </label>
+
+                            <div class="input-group">
+
+                                <input
+                                    type="password"
+                                    id="password"
+                                    class="form-control"
+                                    placeholder="Enter your password"
+                                    autocomplete="current-password"
+                                    required>
+
+                                <button
+                                    class="btn btn-outline-secondary"
+                                    type="button"
+                                    onclick="togglePassword()">
+
+                                    <i class="bi bi-eye" id="eyeIcon"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-check mb-3">
+
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="remember">
+
+                            <label class="form-check-label" for="remember">
+
+                                Remember Me
+
+                            </label>
+
+                        </div>
+
+                        <button
+                            class="btn btn-primary w-100"
+                            onclick="login()">
+
+                            <i class="bi bi-box-arrow-in-right"></i>
+
+                            Login
+
+                        </button>
+
+                        <p class="text-center mt-4 mb-0">
+
+                            Don't have an account?
+
+                            <a href="signup.html">
+
+                                Create Account
+
+                            </a>
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Loader -->
+
+<div id="loader" class="loader">
+
+    <div class="spinner-border text-primary"></div>
+
+</div>
+
+<!-- Footer -->
+
+<footer class="text-center py-3 bg-light">
+
+    <small>
+
+        © 2026 N100 Financial Intelligence Platform |
+        Developed by <strong>Ampolu Rajkumar</strong>
+
+    </small>
+
+</footer>
+
+<!-- Bootstrap -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Common Functions -->
+
+<script src="js/common.js"></script>
+
+<!-- Authentication -->
+
+<script src="js/auth.js"></script>
 
 </body>
+
 </html>
